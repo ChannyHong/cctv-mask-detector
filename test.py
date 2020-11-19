@@ -58,7 +58,7 @@ mtcnn = MTCNN(
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 
 def collate_fn(x):
-    return x[0]
+    return x[0]    
 
 dataset = datasets.ImageFolder('../kaggle-dataset/images_test')
 dataset.idx_to_class = {i:c for c, i in dataset.class_to_idx.items()}
@@ -67,9 +67,9 @@ loader = DataLoader(dataset, collate_fn=collate_fn, num_workers=workers)
 aligned = []
 names = []
 for x, y in loader:
-	print(x,y)
-	x_aligned, prob = mtcnn(x, return_prob=True)
-	if x_aligned is not None:
+    print(x,y)
+    x_aligned, prob = mtcnn(x, return_prob=True)
+    if x_aligned is not None:
         print('Face detected with probability: {:8f}'.format(prob))
         aligned.append(x_aligned)
         names.append(dataset.idx_to_class[y])
