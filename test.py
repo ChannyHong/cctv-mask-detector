@@ -39,6 +39,7 @@ from torchvision import datasets
 import numpy as np
 import pandas as pd
 import os
+import cv2
 
 workers = 0 if os.name == 'nt' else 4
 
@@ -69,8 +70,16 @@ names = []
 for x, y in loader:
     print(x,y)
     #x_aligned, prob = mtcnn(x, return_prob=True)
-    output = mtcnn.detect(x)
-    print(output)
+    boxes = mtcnn.detect(x)
+
+    image_copy = x.copy()
+    draw = ImageDraw.Draw(image_copy)
+
+    print(boxes)
+    for box in boxes:
+        draw.rectangle(box.tolist(), outline=(255, 0, 0), width=6)
+
+    cv2.imwrite("output.jpg", image_copy)
 
 
 '''
