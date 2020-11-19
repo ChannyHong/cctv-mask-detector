@@ -72,12 +72,14 @@ names = []
 for x, y in loader:
     print(x,y)
     #x_aligned, prob = mtcnn(x, return_prob=True)
-    boxes = mtcnn.detect(x)
+    boxes, _ = mtcnn.detect(x)
 
     image_copy = x.copy()
     draw = ImageDraw.Draw(image_copy)
 
     print(boxes)
+    print(len(boxes))
+
     for box in boxes:
         draw.rectangle(box.tolist(), outline=(255, 0, 0), width=6)
 
