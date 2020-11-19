@@ -41,6 +41,8 @@ import pandas as pd
 import os
 import cv2
 
+from PIL import Image, ImageDraw
+
 workers = 0 if os.name == 'nt' else 4
 
 
