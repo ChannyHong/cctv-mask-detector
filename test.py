@@ -83,6 +83,8 @@ for x, y in loader:
     for box in boxes:
         draw.rectangle(box.tolist(), outline=(255, 0, 0), width=6)
 
+    print(image_copy)
+
     cv2.imwrite("../kaggle-dataset/images_test/all/output.jpg", image_copy)
 
 
