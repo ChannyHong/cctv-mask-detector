@@ -69,6 +69,7 @@ loader = DataLoader(dataset, collate_fn=collate_fn, num_workers=workers)
 
 aligned = []
 names = []
+count = 0
 for x, y in loader:
     print(x,y)
     #x_aligned, prob = mtcnn(x, return_prob=True)
@@ -85,7 +86,9 @@ for x, y in loader:
 
     print(image_copy)
 
-    image_copy.save("../kaggle-dataset/images_test/all/output.jpg")
+    image_copy.save("../kaggle-dataset/images_test/all/output{}.jpg".format(count))
+
+    count+=1
 
     #cv2.imwrite("../kaggle-dataset/images_test/all/output.jpg", image_copy)
 
