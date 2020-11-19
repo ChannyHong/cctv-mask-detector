@@ -85,7 +85,9 @@ for x, y in loader:
 
     print(image_copy)
 
-    cv2.imwrite("../kaggle-dataset/images_test/all/output.jpg", image_copy)
+    image_copy.save("../kaggle-dataset/images_test/all/output.jpg")
+
+    #cv2.imwrite("../kaggle-dataset/images_test/all/output.jpg", image_copy)
 
 
 '''
