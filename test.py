@@ -70,7 +70,7 @@ for x, y in loader:
     print(x,y)
     x_aligned, prob = mtcnn(x, return_prob=True)
     if x_aligned is not None:
-        print('Face detected with probability: {:8f}'.format(prob))
+        print('Face detected with probability: {}'.format(prob))
         aligned.append(x_aligned)
         names.append(dataset.idx_to_class[y])
 
