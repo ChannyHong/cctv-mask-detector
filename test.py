@@ -71,7 +71,6 @@ for x, y in loader:
     x_aligned, prob = mtcnn(x, return_prob=True)
     print(x_aligned)
 
-    
     if x_aligned is not None:
         print('Face detected with probability: {}'.format(prob))
         aligned.append(x_aligned)
