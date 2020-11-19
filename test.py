@@ -68,7 +68,8 @@ aligned = []
 names = []
 for x, y in loader:
 	x_aligned, prob = mtcnn(x, return_prob=True)
-    print(x, y)
+    print(x)
+    print(y)
     print(x_aligned)
     if x_aligned is not None:
         print('Face detected with probability: {:8f}'.format(prob))
