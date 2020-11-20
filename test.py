@@ -60,7 +60,7 @@ mtcnn = MTCNN(
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 
 def collate_fn(x):
-    return x
+    return x[1]
 
 dataset = datasets.ImageFolder('../kaggle-dataset/images')
 dataset.idx_to_class = {i:c for c, i in dataset.class_to_idx.items()}
@@ -70,8 +70,8 @@ aligned = []
 names = []
 count = 0
 
-for x in loader:
-    print(x)
+for x, y in loader:
+    print(x,y)
     '''
     #x_aligned, prob = mtcnn(x, return_prob=True)
     boxes, _ = mtcnn.detect(x)
