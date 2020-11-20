@@ -10,4 +10,4 @@ imgNew = img.resize((1280,720),resample=Image.BILINEAR)
 result = imgNew.resize(img.size,Image.NEAREST)
 
 # Save
-result.save('result.png')
+result.save('pixelated.jpg')
