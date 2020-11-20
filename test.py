@@ -74,9 +74,6 @@ for x, y in loader:
     #x_aligned, prob = mtcnn(x, return_prob=True)
     boxes, _ = mtcnn.detect(x)
 
-    if not boxes: 
-    	continue
-
     image_copy = x.copy()
     draw = ImageDraw.Draw(image_copy)
 
