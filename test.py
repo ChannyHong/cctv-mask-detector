@@ -81,9 +81,10 @@ for x, y in loader:
 
     if boxes is None:
     	continue
-    
-    for box in boxes:
-        draw.rectangle(box.tolist(), outline=(255, 0, 0), width=6)
+
+    else:
+	    for box in boxes:
+	        draw.rectangle(box.tolist(), outline=(255, 0, 0), width=6)
 
     print(image_copy)
 
