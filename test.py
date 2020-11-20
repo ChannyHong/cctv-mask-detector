@@ -74,7 +74,7 @@ for x, y in loader:
     #x_aligned, prob = mtcnn(x, return_prob=True)
     boxes, _ = mtcnn.detect(x)
 
-    if boxes = None:
+    if boxes == None:
     	continue
 
     image_copy = x.copy()
