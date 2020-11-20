@@ -73,7 +73,8 @@ count = 1
 for image, label in loader:
     
     #x_aligned, prob = mtcnn(x, return_prob=True)
-    boxes, _ = mtcnn.detect(x)
+    print(count, label)
+    boxes, _ = mtcnn.detect(image)
 
     image_copy = x.copy()
     draw = ImageDraw.Draw(image_copy)
