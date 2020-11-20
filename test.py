@@ -62,35 +62,33 @@ resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 def collate_fn(x):
     return x[0]    
 
-dataset = datasets.ImageFolder('../kaggle-dataset/images_test')
+dataset = datasets.ImageFolder('../kaggle-dataset/images')
 dataset.idx_to_class = {i:c for c, i in dataset.class_to_idx.items()}
 loader = DataLoader(dataset, collate_fn=collate_fn, num_workers=workers)
 
 aligned = []
 names = []
 count = 0
+
 for x, y in loader:
     print(x,y)
+    '''
     #x_aligned, prob = mtcnn(x, return_prob=True)
     boxes, _ = mtcnn.detect(x)
 
     image_copy = x.copy()
     draw = ImageDraw.Draw(image_copy)
 
-    print(boxes)
-
     if not boxes is None:
 	    for box in boxes:
-	        draw.rectangle(box.tolist(), outline=(255, 0, 0), width=6)
-
-    print(image_copy)
+	        draw.rectangle(box.tolist(), outline=(255, 0, 0), width=3)
 
     image_copy.save("../kaggle-dataset/images_test/all/output{}.jpg".format(count))
 
     count+=1
 
     #cv2.imwrite("../kaggle-dataset/images_test/all/output.jpg", image_copy)
-
+'''
 
 '''
     if x_aligned is not None:
