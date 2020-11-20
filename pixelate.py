@@ -14,8 +14,8 @@ for image in images:
 	img = Image.open("../kaggle-dataset/images/original/{}".format(image))
 
 	# Resize smoothly down to 16x16 pixels
-	imgNew = img.resize((1280,720),resample=Image.BILINEAR) # pixelated
-	#imgNew = img.resize((640,360),resample=Image.BILINEAR) # pixelated-x2
+	#imgNew = img.resize((1280,720),resample=Image.BILINEAR) # pixelated
+	imgNew = img.resize((640,360),resample=Image.BILINEAR) # pixelated-x2
 	#imgNew = img.resize((320,180),resample=Image.BILINEAR) # pixelated-x4
 
 
@@ -23,7 +23,7 @@ for image in images:
 	result = imgNew.resize(img.size,Image.NEAREST)
 
 	# Save
-	result.save('../kaggle-dataset/images/pixelated/{}'.format(image))
+	result.save('../kaggle-dataset/images/pixelated-x2/{}'.format(image))
 
 
 
