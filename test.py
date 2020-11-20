@@ -79,7 +79,7 @@ for x, y in loader:
 
     print(boxes)
 
-    if boxes == None:
+    if boxes.all() == None:
     	continue
 
     for box in boxes:
