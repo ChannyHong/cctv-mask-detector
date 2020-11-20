@@ -76,7 +76,7 @@ for image, label in loader:
     print(count, label)
     boxes, _ = mtcnn.detect(image)
 
-    image_copy = x.copy()
+    image_copy = image.copy()
     draw = ImageDraw.Draw(image_copy)
 
     if not boxes is None:
