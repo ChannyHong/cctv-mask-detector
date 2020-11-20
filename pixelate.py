@@ -6,10 +6,12 @@ import os
 
 
 images = os.listdir('../kaggle-dataset/images/original/')
+count = 1
+
 
 for image in images:
 
-	print("pixelating {}".format(image))
+	print("{} : pixelating {}".format(count, image))
 
 	img = Image.open("../kaggle-dataset/images/original/{}".format(image))
 
@@ -25,6 +27,7 @@ for image in images:
 	# Save
 	result.save('../kaggle-dataset/images/pixelated-x2/{}'.format(image))
 
+	count += 1
 
 
 
