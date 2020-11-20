@@ -60,7 +60,7 @@ mtcnn = MTCNN(
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 
 def collate_fn(x):
-    return x[0]    
+    return x
 
 dataset = datasets.ImageFolder('../kaggle-dataset/images')
 dataset.idx_to_class = {i:c for c, i in dataset.class_to_idx.items()}
