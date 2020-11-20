@@ -79,7 +79,7 @@ for x, y in loader:
 
     print(boxes)
 
-    if boxes:
+    if boxes != None:
 	    for box in boxes:
 	        draw.rectangle(box.tolist(), outline=(255, 0, 0), width=6)
 
