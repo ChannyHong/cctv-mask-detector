@@ -83,7 +83,7 @@ for image, label in loader:
 	    for box in boxes:
 	        draw.rectangle(box.tolist(), outline=(255, 0, 0), width=3)
 
-    image_copy.save("../kaggle-dataset/images/{}/{}.jpg".format(label, f'{count:04}'))
+    image_copy.save("../kaggle-dataset/boxed_images/{}/{}.jpg".format(label, f'{count:04}'))
 
     count += 1
 
