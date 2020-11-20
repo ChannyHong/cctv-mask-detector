@@ -10,4 +10,4 @@ imgNew = img.resize((1280,720),resample=Image.BILINEAR)
 result = imgNew.resize(img.size,Image.NEAREST)
 
 # Save
-result.save('pixelated.jpg')
+result.save('../kaggle-dataset/images_test/all/pixelated.jpg')
