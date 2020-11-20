@@ -9,6 +9,8 @@ images = os.listdir('../kaggle-dataset/images/original/')
 
 for image in images:
 
+	print("pixelating {}".format(image))
+
 	img = Image.open("../kaggle-dataset/images/original/{}".format(image))
 
 	# Resize smoothly down to 16x16 pixels
@@ -22,6 +24,7 @@ for image in images:
 
 	# Save
 	result.save('../kaggle-dataset/images/pixelated/{}'.format(image))
+
 
 
 
