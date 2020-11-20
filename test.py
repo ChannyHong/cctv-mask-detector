@@ -68,11 +68,10 @@ loader = DataLoader(dataset, collate_fn=collate_fn, num_workers=workers)
 
 aligned = []
 names = []
-count = 0
+count = 1
 
-for x, y in loader:
-    print(x,y)
-    '''
+for image, label in loader:
+    
     #x_aligned, prob = mtcnn(x, return_prob=True)
     boxes, _ = mtcnn.detect(x)
 
@@ -83,12 +82,12 @@ for x, y in loader:
 	    for box in boxes:
 	        draw.rectangle(box.tolist(), outline=(255, 0, 0), width=3)
 
-    image_copy.save("../kaggle-dataset/images_test/all/output{}.jpg".format(count))
+    image_copy.save("../kaggle-dataset/images/{}/{}.jpg".format(label, f'{count:04}'))
 
-    count+=1
+    count += 1
 
     #cv2.imwrite("../kaggle-dataset/images_test/all/output.jpg", image_copy)
-'''
+
 
 '''
     if x_aligned is not None:
