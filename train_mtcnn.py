@@ -15,7 +15,13 @@ mtcnn = MTCNN(
     device=device, keep_all=True
 )
 
+#print(mtcnn)
 
+in_features = mtcnn.roi_heads.box_predictor.cls_score.in_features
+
+print(in_features)
+
+'''
 
 data_dir = 'test_dataset'
 image_files = os.listdir(data_dir)
@@ -38,4 +44,12 @@ for image_file in image_files:
             draw.rectangle(box.tolist(), outline=(255, 0, 0), width=3)
 
     image_boxed.save(os.path.join("boxed_images", image_file))
+
+'''
+
+
+
+
+
+
 
