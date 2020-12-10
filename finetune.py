@@ -23,6 +23,7 @@ def iou(gt_box, pred_box): # gt_box = [top_left_x, top_left_y, width, height], p
 	box1_y2 = torch.tensor(float(gt_box["y"]) + gt_box["height"], requires_grad=True)
 
 	box2_x1 = pred_box[0]
+	print("box2_x1", box2_x1)
 	box2_x2 = pred_box[2]
 	box2_y1 = pred_box[1]
 	box2_y2 = pred_box[3]
