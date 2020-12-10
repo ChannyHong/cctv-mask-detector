@@ -1,3 +1,5 @@
 .DS_Store
 test_dataset
 boxed_images
+temp_folder
+loss_graphs
