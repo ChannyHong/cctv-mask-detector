@@ -30,7 +30,7 @@ def iou(gt_box, pred_box): # gt_box = [top_left_x, top_left_y, width, height], p
 
 	# determine the (x, y)-coordinates of the intersection rectangle
 	#xA = torch.max(torch.tensor([box1_x1, box2_x1]))
-	xA = torch.max(box1_x1, box2_x1)
+	xA = torch.max(box1_x1, box1_x1)
 	yA = torch.max(box1_y1, box2_y1)
 	xB = torch.min(box1_x2, box2_x2)
 	yB = torch.min(box1_y2, box2_y2)
@@ -73,7 +73,7 @@ def dist(gt_box, pred_box): # gt_box = [top_left_x, top_left_y, width, height], 
 	box2_y2 = pred_box[3]
 
 	# Determine midpoints of each box, then calculate Euclidean distance
-	box1_x_mid = torch.div(torch.add(box1_x1, box1_x1), 2)
+	box1_x_mid = torch.div(torch.add(box1_x1, box1_x2), 2)
 	box1_y_mid = torch.div(torch.add(box1_y1, box1_y2), 2)
 
 	box2_x_mid = torch.div(torch.add(box2_x1, box2_x2), 2)
