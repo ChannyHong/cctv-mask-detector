@@ -215,7 +215,8 @@ def criterion(y_pred, y_data):
 
 
 def main():
-	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+	#device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+	device = "cpu"
 	print('Running on device: {}'.format(device))
 
 	mtcnn = MTCNN(
