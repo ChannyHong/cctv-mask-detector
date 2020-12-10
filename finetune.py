@@ -215,13 +215,13 @@ def criterion(y_pred, y_data):
 
 
 def main():
-	#device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-	device = "cpu"
+	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+	#device = "cpu"
 	print('Running on device: {}'.format(device))
 
 	mtcnn = MTCNN(
 	    image_size=160, margin=0, min_face_size=20,
-	    thresholds=[0.1, 0.3, 0.1], factor=0.709, post_process=True,
+	    thresholds=[0.1, 0.2, 0.1], factor=0.709, post_process=True,
 	    device=device, keep_all=True
 	)
 
