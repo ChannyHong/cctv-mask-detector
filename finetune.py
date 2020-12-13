@@ -257,7 +257,7 @@ def main():
 
 	mtcnn = MTCNN(
 	    image_size=160, margin=0, min_face_size=20,
-	    thresholds=[0.2, 0.3, 0.3], factor=0.709, post_process=True,
+	    thresholds=[0.1, 0.2, 0.2], factor=0.709, post_process=True,
 	    device=device, keep_all=True#, pretrained_model_path="test.pt"
 	)
 
