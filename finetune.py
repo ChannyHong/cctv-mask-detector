@@ -280,7 +280,7 @@ def main():
 		], lr=0.0001)
 
 	# Training loop
-	for epoch in range(10):
+	for epoch in range(1):
 
 		# calculate how many iterations in the epoch
 		iterations = int(train_dataset_size/BATCH_SIZE)
