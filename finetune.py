@@ -328,7 +328,7 @@ def main():
 			loss.backward()
 			optimizer.step()
 
-			if loss < 0.01:
+			if loss < 0.1:
 				torch.save(mtcnn.state_dict(), "./test_ep{}_iter{}_loss{}.pt".format(epoch, iteration_num, loss))
 
 	torch.save(mtcnn.state_dict(), "./test_end.pt")
