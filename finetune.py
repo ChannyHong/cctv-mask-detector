@@ -257,7 +257,7 @@ def main():
 
 	mtcnn = MTCNN(
 	    image_size=160, margin=0, min_face_size=20,
-	    thresholds=[0.3, 0.4, 0.4], factor=0.709, post_process=True,
+	    thresholds=[0.4, 0.5, 0.5], factor=0.709, post_process=True,
 	    device=device, keep_all=True#, pretrained_model_path="test.pt"
 	)
 
@@ -268,7 +268,7 @@ def main():
 
 	# lambda variables
 	lambda_iou = Variable(torch.tensor(1.0), requires_grad=True)
-	lambda_dist = Variable(torch.tensor(0.000005), requires_grad=True)
+	lambda_dist = Variable(torch.tensor(0.0005), requires_grad=True)
 
 	#criterion = torch.nn.MSELoss(reduction='sum')
 	#params = list(mtcnn.parameters()) + [lambda_iou, lambda_dist]
