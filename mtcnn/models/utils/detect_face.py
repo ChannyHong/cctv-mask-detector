@@ -273,12 +273,10 @@ def detect_face_modified(imgs, minsize, pnet, rnet, onet, threshold, factor, dev
     # Second stage
     if len(boxes) > 0:
         im_data = []
-        counter = 0
         for k in range(len(y)):
             if ey[k] > (y[k] - 1) and ex[k] > (x[k] - 1):
                 img_k = imgs[image_inds[k], :, (y[k] - 1):ey[k], (x[k] - 1):ex[k]].unsqueeze(0)
                 im_data.append(imresample(img_k, (24, 24)))
-                counter+=1
         im_data = torch.cat(im_data, dim=0)
         im_data = (im_data - 127.5) * 0.0078125
 

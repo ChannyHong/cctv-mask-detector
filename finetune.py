@@ -23,7 +23,6 @@ def iou(gt_box, pred_box): # gt_box = [top_left_x, top_left_y, width, height], p
 	box1_y2 = torch.tensor(float(gt_box["y"]) + gt_box["height"], requires_grad=True)
 
 	box2_x1 = pred_box[0]
-	print("box2_x1", box2_x1)
 	box2_x2 = pred_box[2]
 	box2_y1 = pred_box[1]
 	box2_y2 = pred_box[3]
@@ -89,20 +88,31 @@ def dist(gt_box, pred_box): # gt_box = [top_left_x, top_left_y, width, height], 
 
 
 
-def criterion(y_pred, y_data):
+def criterion(y_pred, y_data, lambda_iou, lambda_dist):
 	batch_iou_list = None
 	batch_dist_list = None
-	batch_diff_list = None
-
-	counter = 0
+	#batch_diff_list = None
 
 	for y_hat, y_gt in zip(y_pred, y_data): # iterating for each image
-		counter += 1
+
+		# PRINT FOR DEBUGGING
+		if y_hat is not None:
+			print("len(y_hat)", len(y_hat))
+		else:
+			print("len(y_hat)", 0)
+		if y_gt is not None:
+			print("len(y_gt)", len(y_gt))
+		else:
+			print("len(y_hat)", 0)
+		# PRINT FOR DEBUGGING
 
 		# no bounding box for either y_pred or y_gt
 		if y_hat is None or y_gt is None:
+			continue # if either doesn't have any bounding box, skip the entry altogether
+
+			'''
 			if y_hat is None and y_gt is None:
-				continue # just ignore the entry altogether
+				continue # if no bounding box, just ignore the entry altogether
 			elif y_hat is None:
 				number_diff = torch.tensor([len(y_gt)]).type(torch.FloatTensor)
 				if batch_diff_list is None:
@@ -115,10 +125,11 @@ def criterion(y_pred, y_data):
 					batch_diff_list = number_diff 
 				else:
 					batch_diff_list = torch.cat((batch_diff_list, number_diff))
+			'''
 
 		# normal case where there is bounding box for both y_pred and y_gt
 		else:
-			iou_values = None#torch.tensor([[]], requires_grad=True)
+			iou_values = None #torch.tensor([[]], requires_grad=True)
 			dist_values = None
 
 			for pred_box in y_hat: # iterating through each predicted boxes of this image 
@@ -154,10 +165,14 @@ def criterion(y_pred, y_data):
 
 
 			image_average_iou = torch.mean(iou_values)
-			image_average_dist = torch.mean(dist_values)
+			#image_average_dist = torch.mean(dist_values)
+			image_total_dist = torch.sum(dist_values)
 
-			image_num_diff = torch.tensor([abs(len(y_hat) - len(y_gt))]).float()
-			image_num_diff.requires_grad = True
+			print("image_average_iou", image_average_iou)
+			print("image_total_dist", image_total_dist)
+
+			#image_num_diff = torch.tensor([abs(len(y_hat) - len(y_gt))]).float()
+			#image_num_diff.requires_grad = True
 
 
 			image_average_iou = torch.unsqueeze(image_average_iou, 0)
@@ -166,7 +181,15 @@ def criterion(y_pred, y_data):
 			else:
 				batch_iou_list = torch.cat((batch_iou_list, image_average_iou))
 
-			image_average_dist = torch.unsqueeze(image_average_dist, 0)
+			#image_average_dist = torch.unsqueeze(image_average_dist, 0)
+			image_total_dist = torch.unsqueeze(image_total_dist, 0)
+			
+			if batch_dist_list is None:
+				batch_dist_list = image_total_dist
+			else:
+				batch_dist_list = torch.cat((batch_dist_list, image_total_dist))
+
+			'''
 			if batch_dist_list is None:
 				batch_dist_list = image_average_dist
 			else:
@@ -176,31 +199,36 @@ def criterion(y_pred, y_data):
 				batch_diff_list = image_num_diff 
 			else:
 				batch_diff_list = torch.cat((batch_diff_list, image_num_diff))
-
-
+			'''
 
 	if batch_iou_list is None:
 		batch_iou_list = torch.tensor(0.0, requires_grad=True)
 	if batch_dist_list is None:
 		batch_dist_list = torch.tensor(0.0, requires_grad=True)
 
+
 	batch_avg_iou = torch.neg(torch.mean(batch_iou_list))
-	lambda_iou = Variable(torch.tensor(1.0), requires_grad=True)
+	#batch_avg_iou = torch.div(torch.tensor(1), (torch.mean(batch_iou_list)))
 	final_iou = torch.mul(batch_avg_iou, lambda_iou)
 
 	batch_avg_dist = torch.mean(batch_dist_list)
-	lambda_dist = Variable(torch.tensor(1.0), requires_grad=True)
-	final_dist = torch.mul(batch_avg_dist, lambda_dist)
+	lambda_dist_pos = torch.abs(lambda_dist)
+	final_dist = torch.mul(batch_avg_dist, lambda_dist_pos)
 
-	batch_avg_diff = torch.mean(batch_diff_list)
-	lambda_diff = Variable(torch.tensor(1.0), requires_grad=True)
-	final_diff = torch.mul(batch_avg_diff, lambda_diff)
+	print("lambda_iou", lambda_iou)
+	print("lambda_dist", lambda_dist)
+
+	print("final_iou", final_iou)
+	print("final_dist", final_dist)
+
+	#batch_avg_diff = torch.mean(batch_diff_list)
+	#lambda_diff = Variable(torch.tensor(1.0), requires_grad=True)
+	#final_diff = torch.mul(batch_avg_diff, lambda_diff)
 
 	
 	#loss is avg_iou + avg_diff + avg_dist
-	temp = torch.add(final_iou, final_dist)
-	loss = torch.add(temp, final_diff)
-	#loss = batch_avg_iou
+	loss = torch.add(final_iou, final_dist)
+	#loss = torch.add(temp, final_diff)
 
 
 
@@ -223,21 +251,24 @@ def main():
 	mtcnn = MTCNN(
 	    image_size=160, margin=0, min_face_size=20,
 	    thresholds=[0.1, 0.2, 0.1], factor=0.709, post_process=True,
-	    device=device, keep_all=True
+	    device=device, keep_all=True#, pretrained_model_path="test.pt"
 	)
 
 	train_image_list = os.listdir("../labeled_data/image_metadata")
 	train_dataset_size = len(train_image_list)
 
-	train_image_list.sort()
+	#train_image_list.sort()
+
+	# lambda variables
+	lambda_iou = Variable(torch.tensor(1.0), requires_grad=True)
+	lambda_dist = Variable(torch.tensor(1.0), requires_grad=True)
 
 	#criterion = torch.nn.MSELoss(reduction='sum')
-	optimizer = torch.optim.SGD(mtcnn.parameters(), lr=0.001)
+	params = list(mtcnn.parameters()) + [lambda_iou, lambda_dist]
+	optimizer = torch.optim.SGD(params, lr=0.0001)
 
 	# Training loop
 	for epoch in range(2):
-
-		mtcnn.to(device="cuda:0")
 
 		# calculate how many iterations in the epoch
 		iterations = int(train_dataset_size/BATCH_SIZE)
@@ -272,13 +303,13 @@ def main():
 
 			y_pred, probs = mtcnn.detect_face_tensor(x_data) # (batch_size, 4), (batch_size, 1)
 
-			loss = criterion(y_pred, y_data)
+			loss = criterion(y_pred, y_data, lambda_iou, lambda_dist)
 			
 			#model_arch = make_dot(loss)
 			#model_arch.format = 'png'
 			#model_arch.render("loss_graphs/epoch{}-iter{}-loss.png".format(epoch, iteration_num))
 
-			print('Epoch: {} | Iteration: {} | Loss: {} '.format(epoch, iteration_num, loss))
+			print('Epoch: {} | Iteration: {} | Loss: {} \n.\n.\n.\n.\n.'.format(epoch, iteration_num, loss))
 
 			# Zero gradients, perform a backward pass, and update the weights.
 			optimizer.zero_grad()
