@@ -22,7 +22,7 @@ def iou(gt_box, pred_box): # gt_box = [top_left_x, top_left_y, width, height], p
 	box1_y1 = torch.tensor(float(gt_box["y"]), requires_grad=True)
 	box1_y2 = torch.tensor(float(gt_box["y"]) + gt_box["height"], requires_grad=True)
 
-	box2_x1 = pred_box[0]
+	box2_x1 = torch.tensor(pred_box[0])
 	box2_x2 = pred_box[2]
 	box2_y1 = pred_box[1]
 	box2_y2 = pred_box[3]
@@ -261,11 +261,16 @@ def main():
 
 	# lambda variables
 	lambda_iou = Variable(torch.tensor(1.0), requires_grad=True)
-	lambda_dist = Variable(torch.tensor(1.0), requires_grad=True)
+	lambda_dist = Variable(torch.tensor(0.00005), requires_grad=True)
 
 	#criterion = torch.nn.MSELoss(reduction='sum')
-	params = list(mtcnn.parameters()) + [lambda_iou, lambda_dist]
-	optimizer = torch.optim.SGD(params, lr=0.0001)
+	#params = list(mtcnn.parameters()) + [lambda_iou, lambda_dist]
+	#optimizer = torch.optim.SGD(params, lr=0.0001)
+
+	optimizer = torch.optim.SGD([
+		{'params': mtcnn.parameters()}#,
+		#{'params': [lambda_iou, lambda_dist], 'lr': 0.00001}
+		], lr=0.0001)
 
 	# Training loop
 	for epoch in range(2):
