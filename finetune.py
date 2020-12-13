@@ -210,8 +210,9 @@ def criterion(y_pred, y_data, lambda_iou, lambda_dist):
 		batch_dist_list = torch.tensor(0.0, requires_grad=True)
 
 
-	batch_avg_iou = torch.neg(torch.mean(batch_iou_list))
+	#batch_avg_iou = torch.neg(torch.mean(batch_iou_list))
 	#batch_avg_iou = torch.div(torch.tensor(1), (torch.mean(batch_iou_list)))
+	batch_avg_iou = torch.sub(torch.tensor(1), (torch.mean(batch_iou_list)))
 	final_iou = torch.mul(batch_avg_iou, lambda_iou)
 
 	batch_avg_dist = torch.mean(batch_dist_list)
@@ -267,7 +268,7 @@ def main():
 
 	# lambda variables
 	lambda_iou = Variable(torch.tensor(1.0), requires_grad=True)
-	lambda_dist = Variable(torch.tensor(0.0005), requires_grad=True)
+	lambda_dist = Variable(torch.tensor(0.0), requires_grad=True)
 
 	#criterion = torch.nn.MSELoss(reduction='sum')
 	#params = list(mtcnn.parameters()) + [lambda_iou, lambda_dist]
