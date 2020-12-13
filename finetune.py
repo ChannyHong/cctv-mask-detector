@@ -93,17 +93,20 @@ def criterion(y_pred, y_data, lambda_iou, lambda_dist):
 	batch_dist_list = None
 	#batch_diff_list = None
 
+	y_hat_len_list = []
+	y_gt_len_list = []
+
 	for y_hat, y_gt in zip(y_pred, y_data): # iterating for each image
 
 		# PRINT FOR DEBUGGING
 		if y_hat is not None:
-			print("len(y_hat)", len(y_hat))
+			y_hat_len_list.append(len(y_hat))#print("len(y_hat)", len(y_hat))
 		else:
-			print("len(y_hat)", 0)
+			y_hat_len_list.append(0)#print("len(y_hat)", 0)
 		if y_gt is not None:
-			print("len(y_gt)", len(y_gt))
+			y_gt_len_list.append(len(y_gt))#print("len(y_gt)", len(y_gt))
 		else:
-			print("len(y_hat)", 0)
+			y_gt_len_list.append(0)#print("len(y_hat)", 0)
 		# PRINT FOR DEBUGGING
 
 		# no bounding box for either y_pred or y_gt
@@ -168,8 +171,8 @@ def criterion(y_pred, y_data, lambda_iou, lambda_dist):
 			#image_average_dist = torch.mean(dist_values)
 			image_total_dist = torch.sum(dist_values)
 
-			print("image_average_iou", image_average_iou)
-			print("image_total_dist", image_total_dist)
+			#print("image_average_iou", image_average_iou)
+			#print("image_total_dist", image_total_dist)
 
 			#image_num_diff = torch.tensor([abs(len(y_hat) - len(y_gt))]).float()
 			#image_num_diff.requires_grad = True
@@ -217,6 +220,9 @@ def criterion(y_pred, y_data, lambda_iou, lambda_dist):
 
 	print("lambda_iou", lambda_iou)
 	print("lambda_dist", lambda_dist)
+
+	print("average_y_hat_len", float(sum(y_hat_len_list)) / float(len(y_hat_len_list)))
+	print("average_y_gt_len", float(sum(y_gt_len_list)) / float(len(y_gt_len_list)))
 
 	print("final_iou", final_iou)
 	print("final_dist", final_dist)
