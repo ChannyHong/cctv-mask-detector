@@ -261,7 +261,7 @@ def main():
 
 	# lambda variables
 	lambda_iou = Variable(torch.tensor(1.0), requires_grad=True)
-	lambda_dist = Variable(torch.tensor(0.00005), requires_grad=True)
+	lambda_dist = Variable(torch.tensor(0.0005), requires_grad=True)
 
 	#criterion = torch.nn.MSELoss(reduction='sum')
 	#params = list(mtcnn.parameters()) + [lambda_iou, lambda_dist]
@@ -273,7 +273,7 @@ def main():
 		], lr=0.0001)
 
 	# Training loop
-	for epoch in range(2):
+	for epoch in range(10):
 
 		# calculate how many iterations in the epoch
 		iterations = int(train_dataset_size/BATCH_SIZE)
@@ -321,7 +321,10 @@ def main():
 			loss.backward()
 			optimizer.step()
 
-	torch.save(mtcnn.state_dict(), "./test.pt")
+			if loss < 0.01:
+				torch.save(mtcnn.state_dict(), "./test_ep{}_iter{}_loss{}.pt".format(epoch, iteration_num, loss))
+
+	torch.save(mtcnn.state_dict(), "./test_end.pt")
 
 
 if __name__ == "__main__":
