@@ -31,7 +31,7 @@ Now let's get down to the knitty-gritty. At first glance, this should not be an 
 
 As for the face recognition model, there already are many awesome face detection models (pretrained) available out and about the internet from which I can just pick out the face recognition portion. MTCNN (multi-task convolutional neural network) seems to do the trick well, and I ultimately decided to use [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) as a starting point. The repository comes with a pretrained MTCNN model that can be adapted for our use.
 
-The mask detection model should be even easier to implement. [cabani's MaskedFace-Net](https://github.com/cabani/MaskedFace-Net) project provides correctly masked and incorrectly masked versions of the [FFHQ-dataset](https://github.com/NVlabs/ffhq-dataset)(the original would be the not masked class) which can be our training data for the mask detection three-way classifier model.
+The mask detection model should be even easier to implement. [cabani's MaskedFace-Net](https://github.com/cabani/MaskedFace-Net) project provides correctly masked and incorrectly masked versions of the [FFHQ-dataset](https://github.com/NVlabs/ffhq-dataset)(the original would be the not masked class) which can be our training data for the mask detection three-way classifier model. We are just going to use a very simple CNN with two convolutional layers and two pooling layers, given the simplicity of the task at hand.
 
 Bootstrapping this without any annotating on our end, our project spec looks as the following:
 
@@ -44,9 +44,11 @@ Model Training
 1. Use the pretrained MTCNN face recognition model from [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) to extract bounding boxes.
 2. Train the mask detection classifier using the resulting bounding boxes from the previous step.
 
+[SHOW SIMPLE DIAGRAM HERE]
+
 ## Implementation Code
 
-Make sure you have the following libraries installed in your environment:
+I used Python 3.7.9 for this project. Make sure you have the following libraries installed in your environment:
 - torch
 - facenet_pytorch
 
@@ -58,8 +60,27 @@ First, download the [MaskedFace-Net](https://github.com/cabani/MaskedFace-Net) p
 
 ```
 python extract_faces.py
+```
+
+**Train Mask Detection Classifier**
 
 ```
+python train_mask_detection_model.py
+```
+
+This script will output a .pt model file into our 
+
+## Preliminary Testing
+
+Now, we are going to test our MTCNN face recognizer + mask detection CNN
+
+
+However, 
+
+[gif image here showing utter failure]
+
+
+## Finetuning To The Rescue
 
 
 Implementation in details
