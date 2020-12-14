@@ -15,29 +15,23 @@ mtcnn = MTCNN(
     device=device, keep_all=True, pretrained_model_path="mtcnn_finetuned.pt"
 )
 
-train_image_list = os.listdir("../labeled_data/image_metadata")
+train_image_list = os.listdir("test_dataset")
+train_image_list.remove(".DS_Store")
+
+
 train_dataset_size = len(train_image_list)
+#train_image_list.sort()
 
-train_image_list.sort()
-
-#train_image_list.remove(".DS_Store")
 #image_list.sort()
 
 
 
 
 for i in range(train_dataset_size):
-	metadata_filename = train_image_list[i]
-	metadata_file_pointer = open(os.path.join("../labeled_data/image_metadata", metadata_filename), "r+")
-	metadata_dict = json.load(metadata_file_pointer)
-	metadata_file_pointer.close()
-	label_id = metadata_dict["label_id"]
+	image_filename = train_image_list[i]
 
-
-	image_filename = metadata_filename[:-5]
-	image = Image.open(os.path.join("../labeled_data/images", image_filename))
+	image = Image.open(os.path.join("test_dataset", image_filename))
 				
-
 
 	image_boxed = image.copy()
 	draw = ImageDraw.Draw(image_boxed)
@@ -58,7 +52,7 @@ for i in range(train_dataset_size):
 		for box in boxes:
 			draw.rectangle(box.tolist(), outline=(255, 0, 0), width=3)
 
-	image_boxed.save(os.path.join("../labeled_data/draw_boxes", image_filename))
+	image_boxed.save(os.path.join("test_dataset_boxes", image_filename))
 
 
 
