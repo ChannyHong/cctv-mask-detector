@@ -3,7 +3,7 @@
 This is the project page for the CCTV Mask Detector project that I did as part of my internship at Superb AI during the fall of 2020. 
 
 Copyright 2020 Superb AI, Inc.\
-The code, cache files, and the models are all released under the Apache 2.0 license.\
+The code and the models are all released under the Apache 2.0 license.\
 Authors: Channy Hong
 
 ---
