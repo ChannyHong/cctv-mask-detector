@@ -138,32 +138,104 @@ The reconstructed vidoes should now be in the 'reconstructed_videos' folder. An 
 
 As expected, our model does a terrible job at the moment even placing bounding boxes around faces. What should we do next?
 
-## Finetuning To The Rescue
+## Finetuning To The Rescue (MTCNN)
 
+So the very first (and a big one at that) problem we have is that the MTCNN face recognizer is not even picking up on folks' faces. This is a big problem, since our mask detection classifier very much depends on the output bounding boxes.
 
-Implementation in details
+Okay, so it seems like we're going to need to annotate some live data on the go in order to finetune our MTCNN face recognizer. Time to unlock the powers of Superb AI's Suite!
 
+First log into Superb AI's [Suite](https://suite.superb-ai.com/) (make a free account if you don't have one already) and make a new project. I chose 'image' as data type and 'box' as annotation type. I then added 3 classes to the project: 'correctly_masked', 'incorrectly_masked', and 'not_masked'.
 
+EDIT: You can now use Suite's video data type to streamline the annotation process even more!
 
-If you take a look at the Arlo footage, you will be able to tell straightaway that the 
+Then, in order to streamline this workflow, we are now going to hook our project to with our local dev environment. First, if you don't have the Suite CLI installed already, run:
 
-However, we know 
+```
+pip install spb-cli
+```
 
+Then, we are going to need to authenticate our dev environment to the project. Get the account 'Access Key' from 'My Account > Advanced' menu, and keep it handy for the following command:
 
-As with most projects, I am going to 
+```
+spb configure
+Suite Account Name: [your account name, then press Enter]
+Access Key: [the access key, then press Enter]
+``` 
 
+Now, we are going to upload our deconstructed frames onto Suite so we can distribute
 
+```
+spb upload arlo_footage/deconstructed_frames
+Project Name: [project name, then press Enter]
+Dataset Name: [dataset name, then press Enter]
+``` 
 
-So in summary, the 
+For this project, I recruited the help of Kevin, Ike, Jack for the labeling process. From the Suite 'label list' section, I divied up the images into 4 cohorts and we each took about an hour labeling them (bounding box around each face).
 
+[labeling example gif]
 
+Now, let me export the labels so we can use them for the finetuning processes:
 
+```
+spb download
+Project Name: [project name, then press Enter]
+``` 
 
+Okay, we are now ready to rumble with the finetuning process. I had to tinker with with [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) quite a bit to isolate the MTCNN model. I also designed a custom loss function for this funetuning script. Anyways, run the following script to begin finetuning our MTCNN face recognizer model:
 
-In order to 
+```
+python finetune_mtcnn.py
+```
 
+[show gif of loss going down]
 
+Okay, let's try running our model again and seeing how it works
+```
+python test.py \
+--data_dir=arlo_footage/deconstructed_frames
+``` 
 
-common problems that 
+Reconstruct video files:
+```
+python reconstruct.py
+--data_dir=arlo_footage/output_frames
+``` 
 
-I was especialy exposed to the common problems that machine learning projects face upon deployment, which is that 
+The face recognizing part is working great now, but the mask detection portion is still quite dysfunctional... Well, good thing we did classification (on top of bounding boxes) while we were annotating! Time to put these pieces of data to use as well!
+
+## Finetuning Cont'd (Mask Detection CNN)
+
+We are now going to finetune our using the bounding box classification data we have from the labels. Same as before, we first extract the faces from the Arlo deconstructed frames using the following script:
+```
+python extract_faces.py
+```
+
+Then, we finetune our mask detection CNN model further:
+```
+python train_mask_detection_model.py
+```
+
+## Final Result
+
+Now let's test out our fully finetuned model on the Arlo footage frames:
+```
+python test.py \
+--data_dir=arlo_footage/deconstructed_frames
+``` 
+
+Reconstruct video files:
+```
+python reconstruct.py
+--data_dir=arlo_footage/output_frames
+``` 
+
+Hooray, now the model seems to be a great job both recognizing faces and classifying whether folks are correctly masked, incorrectly masked, or not masked at all!
+
+## Continuing Edge Cases
+
+[edge cases still appear... we need to continuosly integrate labeling]
+
+## Integrating Labeling Work Into MLOps Using Superb AI's Suite
+
+[MLOPs code]
+
