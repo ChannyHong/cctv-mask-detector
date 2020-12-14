@@ -52,9 +52,28 @@ I used Python 3.7.9 for this project. Make sure you have the following libraries
 - torch
 - facenet_pytorch
 
-**Data Setup**
+**Project & Data Setup**
 
-First, download the [MaskedFace-Net](https://github.com/cabani/MaskedFace-Net) project into the "mask_dataset" folder.
+First create an empty folder called 'mask_dataset':
+```
+mkdir mask_dataset
+```
+
+Then, download the [MaskedFace-Net](https://github.com/cabani/MaskedFace-Net) project into the "mask_dataset" folder. Make sure to have separate folders for each mask detection class, and also within it, one for each 'train' and 'test'. The folder structure should look as the following:
+```
+mask_dataset
+    L correctly_masked
+        L train
+            L img1.jpg
+            L img2.jpg
+            L ...
+        L test
+            L ...
+    L incorrectly_masked
+        L ...
+    L not_masked
+        L ...
+```
 
 **Extract Face Bounding Boxes**
 
@@ -64,15 +83,37 @@ python extract_faces.py
 
 **Train Mask Detection Classifier**
 
+First, we create a 'models' folder where we will be storing the output .pt model file.
+```
+mkdir models
+```
+
+Now run the training script on the training dataset.
 ```
 python train_mask_detection_model.py
 ```
 
-This script will output a .pt model file into our 
+When the training is complete, the output .pt model file will be in our 'models' folder. 
+
+## Sanity Check
+
+Now, we are going to test our MTCNN face recognizer + mask detection CNN models on the test dataset.
+
+```
+python test.py
+```
 
 ## Preliminary Testing
 
-Now, we are going to test our MTCNN face recognizer + mask detection CNN
+Now, we are going to test our MTCNN face recognizer + mask detection CNN models on our Arlo security camera footage. Here's a raw footage of me walking out of the office.
+
+[Channy gif]
+
+Right from the get-go, it's very apparent that . Similar to concept drift, our models may have a hard time picking up on the 
+
+ I am pretty certain that our model is not going to do super well 
+
+Since our footage is a video file, we are going to need to deconstruct them into individual frames before feeding them into our model.
 
 
 However, 
