@@ -10,26 +10,26 @@ Authors: Channy Hong
 
 ## Background
 
-The year 2020 was shaped by the coronavirus pandemic in ways that pervaded our everyday lives. In particular, mask-wearing became the social norm for everyone when going outside. And because humans are animals of habits, one of the most common "oops, forgot to..." moments this year perhaps has been forgetting to put on one's mask before leaving the door. The same could be said for the wonderful folks as Superb AI as well, and to ensure that everyone is safe from this dangerous disease, we came up with a very simple ML solution to this problem.
+The year 2020 was shaped by the coronavirus pandemic in ways that pervaded our everyday lives. In particular, mask-wearing became the social norm for everyone when going outside. And because humans are animals of habits, one of the most common "oops, forgot to..." moments this year perhaps has been forgetting to put on one's mask before leaving the door. The same could be said for the wonderful folks at Superb AI R&D office in Seoul, South Korea as well, and I was musing with the idea of coming up with a really simple ML solution to this 'forgetting' problem.
 
-On a separate note, I also wanted to internally test out the usefulness of Superb AI's Suite within a machine learning project workflow. During my internship, I was exposed to the various ways in which machine learning projects en route to deployment face. And perhaps one of the most common challenges faced was in continuously integrating the data annotation process, which is especially relevant in concept drift scenarios.
+On a separate note, I also wanted to internally test out the usefulness of Superb AI's Suite within a machine learning project workflow. During my internship, I was exposed to the various ways in which machine learning projects en route to deployment face obstacles and difficulties. And perhaps one of the most common challenges faced was in continuously integrating the data annotation process, which is absolutely essential in combating the ever-so prevalent problem of concept drift scenarios.
 
-Concept drift occurs when deployed models assume that the incoming live data will be similar to that it was trained on. The fact of the matter is that it often is not the case - in some cases even impossible - that the data that our deployed model will predict on will be of the same distribution to the training data used to train it. In almost all cases, a subset of the live data must be continuosuly annotated and fed back into the training loop to make sure that our model doesn't degrade over time.
+Concept drift occurs when deployed models assume that the incoming live data will be similar to that it was trained on. The fact of the matter is that it often is not the case - in some cases even impossible - that the data that our deployed model will predict on will be of the same distribution as the training data used to train it. In almost all cases, a subset of the live data must be continuosuly annotated and fed back into the training loop to make sure that our model doesn't degrade over time.
 
 ## Big Picture
 
-The big picture idea behind this project is to hook up our Arlo security camera with an ML model that detects whether folks leaving the office has their mask on or not. At the top level, our machine learning model would consist of the following:
+The big picture of this project is to hook up our Arlo security camera (which films the front of the office entrance) with an ML model that detects whether folks leaving the office has their mask on or not. At the top level, our ML model would consist of the following:
 
-1. Face recognition model that first identifies all the faces in a frame (bounding box).
+1. Face recognition model that first identifies all the faces in a frame (as bounding boxes).
 2. Mask detection model that then classifies whether a given face is (a) correctly masked (b) incorrectly masked or (c) not masked
 
-And if less than 75% of folks in the frame are correctly masked, then the model automatically triggers an announcement that yells "Don't forget to wear your mask correctly before going outside!"
+And if less than 75% of folks in the frame are correctly masked, then the model automatically triggers an announcement that reads "Don't forget to wear your mask correctly before leaving the office!"
 
 ## Implementation Strategy In Details
 
-Now let's get down to the knitty-gritty. At first glance, this should not be an extremely difficult model to implement. 
+Now let's get down to the knitty-gritty. At first glance, this shouldn't be too difficult a model to implement. 
 
-As for the face recognition model, there already are many awesome face detection models (pretrained) available out and about the internet from which I can just pick out the face recognition portion. MTCNN (multi-task convolutional neural network) seems to do the trick well, and I ultimately decided to use [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) as a starting point. The repository comes with a pretrained MTCNN model that can be adapted for our use.
+As for the face recognition model, there already are many awesome face detection models (pretrained) available out and about the internet from which I can just pick out the face recognition portion. MTCNN (multi-task convolutional neural network) seems to do the trick well for the recognition portion, and I ultimately decided to use [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) as a starting point. The repository comes with a pretrained MTCNN model (as separate ONet, PNet, RNet models) that can be adapted for our use.
 
 The mask detection model should be even easier to implement. [cabani's MaskedFace-Net](https://github.com/cabani/MaskedFace-Net) project provides correctly masked and incorrectly masked versions of the [FFHQ-dataset](https://github.com/NVlabs/ffhq-dataset)(the original would be the not masked class) which can be our training data for the mask detection three-way classifier model. We are just going to use a very simple CNN with two convolutional layers and two pooling layers, given the simplicity of the task at hand.
 
@@ -62,16 +62,14 @@ mkdir mask_dataset
 Then, download the [MaskedFace-Net](https://github.com/cabani/MaskedFace-Net) project into the "mask_dataset" folder. Make sure to have separate folders for each mask detection class, and also within it, one for each 'train' and 'test'. The folder structure should look as the following:
 ```
 mask_dataset
-    L correctly_masked
-        L train
-            L img1.jpg
-            L img2.jpg
+    L train
+        L protected
+            L image1.jpeg
+            L image2.jpeg
             L ...
-        L test
+        L unprotected
             L ...
-    L incorrectly_masked
-        L ...
-    L not_masked
+    L test
         L ...
 ```
 
@@ -85,7 +83,7 @@ python extract_faces.py
 
 First, we create a 'models' folder where we will be storing the output .pt model file.
 ```
-mkdir models
+mkdir model_files
 ```
 
 Now run the training script on the training dataset.
@@ -100,7 +98,7 @@ When the training is complete, the output .pt model file will be in our 'models'
 Now, we are going to test our MTCNN face recognizer + mask detection CNN models on the test dataset.
 
 ```
-python test.py \
+python test_detection_model.py \
 --data_dir=mask_dataset
 ```
 
