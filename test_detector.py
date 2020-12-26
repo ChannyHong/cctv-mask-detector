@@ -45,7 +45,7 @@ def main():
         device=device, keep_all=True
     )
 
-    detector = Detector(pretrained_model_path="models/XXX.pt")
+    detector = Detector(pretrained_model_path="models/test_end.pt")
 
     test_image_dir = "mask_dataset/test"
 
