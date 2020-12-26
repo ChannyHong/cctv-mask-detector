@@ -25,6 +25,7 @@ class Detector(nn.Module):
         self.load_state_dict(state_dict)
 
     def forward(self, x):
+        print(x)
         in_size = x.size(0)
         x = F.relu(self.mp(self.conv1(x)))
         x = F.relu(self.mp(self.conv2(x)))
@@ -53,7 +54,10 @@ def main():
     y_data = []
 
     protected_files = os.listdir(os.path.join(test_image_dir, "protected"))
+    #protected_files.remove(".DS_Store")
+
     unprotected_files = os.listdir(os.path.join(test_image_dir, "unprotected"))
+    #unprotected_files.remove(".DS_Store")
 
 
     # LOAD TEST EXAMPLES
@@ -67,11 +71,11 @@ def main():
             # multiple protected faces in the image
             if protected_faces.size()[0] > 1:
                 for protected_face in protected_faces:
-                    test_examples.append((protected_image, 1))
+                    test_examples.append((protected_face, 1))
             # one protected face in the image
             else:
                 protected_face = torch.squeeze(protected_faces)
-                test_examples.append((protected_image, 1))
+                test_examples.append((protected_face, 1))
 
     for unprotected_file in unprotected_files:
         unprotected_image = Image.open(os.path.join(test_image_dir, "unprotected", unprotected_file))
@@ -101,6 +105,8 @@ def main():
     num_false_negative = 0
 
     for image, label in test_examples:
+        print(image)
+        print(label)
         pred = detector(image)
 
         # prediction = positive (protected)
