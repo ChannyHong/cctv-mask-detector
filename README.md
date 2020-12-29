@@ -152,6 +152,8 @@ Accuracy:  0.96
 Now onto the real deal. We are going try testing our MTCNN face recognizer + mask detection CNN model on our Arlo security camera footage. Here's a raw footage of me walking into the office.
 
 ![](images/channy-in.gif)
+
+
 ![](images/channy-out.gif)
 
 And now, the moment of truth! Let's try 
