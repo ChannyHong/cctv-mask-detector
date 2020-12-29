@@ -151,7 +151,7 @@ Accuracy:  0.96
 
 Now onto the real deal. We are going try testing our MTCNN face recognizer + mask detection CNN model on our Arlo security camera footage. Here's a raw footage of me walking into the office.
 
-[](test.gif)
+![](test.gif)
 [Channy gif]
 
 Right from the get-go, it's very apparent that . Similar to concept drift, I suspect that our model is going to have a hard time dealing with the low resolution and the . Similar to concept drift, the difference in the distribution of this live data from the training dataset will 
