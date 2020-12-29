@@ -31,19 +31,19 @@ Now let's get down to the knitty-gritty. At first glance, it feels like this sho
 
 As for the face recognition model, there already are many awesome face detection models (pretrained) available out and about the internet from which I can just pick out the face recognition portion. MTCNN (multi-task convolutional neural network) seems to do the trick well for the recognition portion, and I ultimately decided to use [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) as a starting point. The repository comes with a pretrained MTCNN model (as separate ONet, PNet, RNet models) that can be adapted for our use.
 
-The mask detection model should be even easier to implement. We can use one of many publicly available face mask datasets available on the internet to use as training data for the mask detection binary classifier model. Given the simplicity of the task at hand, we are just going to use a very simple CNN with two convolutional layers each with a pooling layer, followed by a feedforward layer that outputs a final confidence value for 'protected' versus 'unprotected'. I used 
+The mask detection model should be even easier to implement. We can use one of many publicly available face mask datasets available on the internet to use as training data for the mask detection binary classifier model. Given the simplicity of the task at hand, we are just going to use a very simple CNN with two convolutional layers each with a pooling layer, followed by a feedforward layer that outputs a final confidence value for 'protected' versus 'unprotected'. I used [this dataset](https://www.kaggle.com/harry418/dataset-for-mask-detection) from Kaggle for training the detector.
 
 Bootstrapping all this without having done any data labeling on our end, our project spec looks as the following:
 
 Data:
-- 'protected' class: from 
-- 'unprotected' class: from 
+- 'protected' class: from [this dataset](https://www.kaggle.com/harry418/dataset-for-mask-detection)
+- 'unprotected' class: from [this dataset](https://www.kaggle.com/harry418/dataset-for-mask-detection)
 
 Model Training
 1. Use the pretrained MTCNN face recognition model from [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) to extract faces.
 2. Train the mask detection classifier using the resulting faces from the previous step.
 
-<img src="images/model.png" weight="100">
+<img src="images/simple_diagram.png" weight="100">
 
 ## Implementation Code
 
@@ -53,24 +53,43 @@ I used Python 3.7.9 for this project. Make sure you have the following libraries
 
 **Project & Data Setup**
 
-First create an empty folder called 'mask_dataset':
-```
-mkdir mask_dataset
-```
-
-Then, download the [MaskedFace-Net](https://github.com/cabani/MaskedFace-Net) project into the "mask_dataset" folder. Make sure to have separate folders for each mask detection class, and also within it, one for each 'train' and 'test'. The folder structure should look as the following:
+First I created an empty folder called 'mask_dataset' with the following structure
 ```
 mask_dataset
     L train
         L protected
-            L image1.jpeg
-            L image2.jpeg
+        L unprotected
+    L test
+        L protected
+        L unprotected
+```
+by running these commands
+```
+mkdir mask_dataset
+mkdir mask_dataset/train
+mkdir mask_dataset/train/protected
+mkdir mask_dataset/train/unprotected
+mkdir mask_dataset/test
+mkdir mask_dataset/test/protected
+mkdir mask_dataset/test/unprotected
+```
+
+Then I downloaded [this dataset](https://www.kaggle.com/harry418/dataset-for-mask-detection) and divided up the images inside 'with_mask' and 'without_mask' folders into train and test examples. Then, I moved them into their respective folders. 
+```
+mask_dataset
+    L train
+        L protected
+            L 1.jpeg
+            L 2.jpeg
             L ...
         L unprotected
+            L 1.jpeg
             L ...
     L test
         L ...
 ```
+
+In my case, I allocated 500 images per class as train examples (1000 images for training in total) and the rest as test examples. Furthermore, I 
 
 **Train Mask Detection Classifier**
 
