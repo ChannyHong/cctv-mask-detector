@@ -153,7 +153,6 @@ Now onto the real deal. We are going try testing our MTCNN face recognizer + mas
 
 ![](images/channy-in.gif)
 
-
 ![](images/channy-out.gif)
 
 And now, the moment of truth! Let's try 
