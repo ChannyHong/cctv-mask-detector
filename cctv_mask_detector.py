@@ -15,9 +15,11 @@
 # Authors: Channy Hong
 
 import os
+import numpy as np
 
 from mtcnn import MTCNN
-from PIL import Image
+from PIL import Image, ImageDraw
+import cv2
 
 import torch
 import torch.nn as nn
@@ -27,8 +29,9 @@ import argparse
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--footage_path', type=str, help='Required: the path to the folder consisting of the footage files', default="mask_dataset/test")
+parser.add_argument('--footage_path', type=str, help='Required: the path to the footage file', default="mask_dataset/test")
 parser.add_argument('--detector_model_path', type=str, help='Required: the path to the detector .pt model file', required=True)
+parser.add_argument('--output_path', type=str, help='Required: the path to output the annotated video file to', required=True)
 parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
 
 
@@ -63,104 +66,81 @@ def main():
     if args.mtcnn_model_path:
         mtcnn = MTCNN(
             image_size=160, margin=0, min_face_size=20,
-            thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
+            thresholds=[0.1, 0.2, 0.2], factor=0.709, post_process=True,
             device=device, keep_all=True, pretrained_model_path=args.mtcnn_model_path
         )
     else:
         mtcnn = MTCNN(
             image_size=160, margin=0, min_face_size=20,
-            thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
+            thresholds=[0.1, 0.2, 0.2], factor=0.709, post_process=True,
             device=device, keep_all=True
         )
 
     detector = Detector(pretrained_model_path=args.detector_model_path)
 
-    footage_dir = args.footage_path
+    vidcap = cv2.VideoCapture(args.footage_path)
+    success, frame = vidcap.read() # get the first frame
 
-    y_pred = []
+    height, width, _ = frame.shape
 
-    protected_files = os.listdir(os.path.join(footage_dir, "protected"))
+    # Deconstruct the video and load onto memory by reading one by one
 
-    unprotected_files = os.listdir(os.path.join(test_image_dir, "unprotected"))
-    unprotected_files.remove(".DS_Store")
+    annotated_frames = []
 
-    # LOAD TEST EXAMPLES
-    test_examples = []
+    while success:
 
-    for protected_file in protected_files:
-        protected_image = Image.open(os.path.join(test_image_dir, "protected", protected_file))
-        protected_faces = mtcnn(protected_image)
+        # Convert cv2 image to PIL image
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(frame)
 
-        if protected_faces is not None:
-            # multiple protected faces in the image
-            if protected_faces.size()[0] > 1:
-                for protected_face in protected_faces:
-                    test_examples.append((protected_face, 1))
-            # one protected face in the image
-            else:
-                protected_face = torch.squeeze(protected_faces)
-                test_examples.append((protected_face, 1))
+        image_annotated = image.copy()
+        draw = ImageDraw.Draw(image_annotated)
 
-    for unprotected_file in unprotected_files:
-        unprotected_image = Image.open(os.path.join(test_image_dir, "unprotected", unprotected_file))
-        unprotected_faces = mtcnn(unprotected_image)
-        
-        if unprotected_faces is not None:
-            # multiple protected faces in the image
-            if unprotected_faces.size()[0] > 1:
-                for unprotected_face in unprotected_faces:
-                    test_examples.append((unprotected_face, 0))
-            # one protected face in the image
-            else:
-                unprotected_face = torch.squeeze(unprotected_faces)
-                test_examples.append((unprotected_face, 0))
-    
+        face_box_pairs = mtcnn.detect_face_box_pairs(image)
 
-    # SHUFFLE TEST EXAMPLES
-    random.shuffle(test_examples)
+        if face_box_pairs is not None:
+            for face_box_pair in face_box_pairs:
+                face, box = face_box_pair
 
-    # CHECK THE ANSWERS
-    num_true_positive = 0
-    num_false_positive = 0
+                face = [face]
+                face = torch.stack(face)
+                face = torch.squeeze(face, 1)
 
-    num_true_negative = 0
-    num_false_negative = 0
+                pred = detector(face)
 
-    for image, label in test_examples:
-        image = [image]
-        image = torch.stack(image)
-        image = torch.squeeze(image, 1)
+                draw.rectangle(box.tolist(), outline=(255, 0, 0), width=3)
+                # draw label here too
 
-        pred = detector(image)
+        annotated_frames.append(image_annotated)
 
-        # prediction = positive (protected)
-        if pred >= 0.5:
-            if label == 1:
-                num_true_positive += 1
-            elif label == 0:
-                num_false_positive += 1
+        # get the next frame
+        success, frame = vidcap.read()
 
-        # prediction = negative (unprotected)
-        elif pred < 0.5:
-            if label == 0:
-                num_true_negative += 1
-            elif label == 1:
-                num_false_negative += 1
 
-    # PRINT RESULTS
-    print("All done!")
-    print("num_true_positive: ", num_true_positive)
-    print("num_false_positive: ", num_false_positive)
-    print("num_true_negative: ", num_true_negative)
-    print("num_false_negative: ", num_false_negative)
 
-    num_correct = num_true_positive + num_true_negative
-    num_incorrect = num_false_positive + num_false_negative
+    # WRITE THE VIDEO NOW
+    #video = cv2.VideoWriter(args.output_path,cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
+    video = cv2.VideoWriter(args.output_path, -1, 12, (width, height))
 
-    print("num_correct: ", num_correct)
-    print("num_incorrect: ", num_incorrect)
+    print("annotated_frames", annotated_frames)
 
-    print("Accuracy: ", float(num_correct) / float(num_correct + num_incorrect))
+    for annotated_frame in annotated_frames:
+
+        # Convert PIL Image back to cv2 image
+        upload_frame = np.array(annotated_frame)
+
+        # Convert RGB to BGR 
+        upload_frame = cv2.cvtColor(np.asarray(upload_frame), cv2.COLOR_RGB2BGR)
+        print(upload_frame)
+
+        video.write(upload_frame)
+
+    video.release()
+
+
+
+
+
 
 if __name__ == "__main__":
     main()

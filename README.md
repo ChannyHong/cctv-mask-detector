@@ -154,46 +154,31 @@ Accuracy:  0.96
 Now onto the real deal. We are going try testing our MTCNN face recognizer + mask detection CNN model on our Arlo security camera footage. Here's a raw footage of me walking into the office.
 
 ![](images/channy_in.gif)
-![](images/channy_out.gif)
 
-Right from the get-go, I can already kinda guess that our model might have a hard time doing its job detecting whether my face is protected by a mask or not. Similar to concept drift, the live data that our model is going to see here is very different from the data it was trained on, and so it might behave all funky. For instance, because of the angle that our Arlo camera is pointing at, I suspect that the current MTCNN might have a bit of a trouble identifying faces at all. But we won't know until we try, so let's try!
+Right from the get-go, I can already kinda guess that our model might have a hard time doing its job detecting whether my face is protected by a mask or not. Similar to concept drift, the live data that our model is going to see here is very different from the data it was trained on, and so it might behave all funky. For instance, because of the angle that our Arlo camera is pointing at, I suspect that the current MTCNN might have a bit of a trouble identifying faces at all. But we won't know until we try, so let's give it a try!
+
+This script starts by deconstructing the Arlo footage (.mp4 file) into individual frames, then run the frames through the MTCNN model to place bounding boxes around the faces & through the mask detector model to classify the face as protected or not, and place the label below the box. The script finishes by reconstructing the frames back into a video form that can be viewed.
+
+Let's first make a directory wherein we'll save the annotated footage.
 
 ```
-
+mkdir annotated_footage
 
 ```
+Now, let's run the script.
 
-This script starts by deconstructing the
-
-
-Let's start by making a folder first that is going to store our 
-
-
-Since our footage is a video file, we are going to need to deconstruct them into individual frames before feeding them into our model. Then we draw bounding boxes + classify them frame by frame, and then we can reconstruct them back into video files for viewing. Upon deployment, this all can happen on-the-go using the live feed.
-
-Deconstruct video files:
 ```
-python deconstruct.py \
---data_dir=arlo_footage/raw_videos
-``` 
-
-Feed Arlo footage frames into our model:
+python cctv_mask_detector.py \
+--detector_model_path=models/detector.pt \
+--footage_path=footage/example.mp4 \
+--output_path=annotated_footage/annotated_channy_in.mp4
 ```
-python test.py \
---data_dir=arlo_footage/deconstructed_frames
-``` 
 
-Reconstruct video files:
-```
-python reconstruct.py
---data_dir=arlo_footage/output_frames
-``` 
+The annotated vidoes should now be in the 'annotated_footage' folder. As an example:
 
-The reconstructed vidoes should now be in the 'reconstructed_videos' folder. An example of a reconstruction:
+![](images/annotated_channy_in.gif)
 
-[gif image here showing utter failure]
-
-As expected, our model does a terrible job at the moment even placing bounding boxes around faces. What should we do next?
+As expected, our model does a terrible job at the moment even placing bounding boxes around... But at least the face  What should we do next?
 
 ## Finetuning To The Rescue (MTCNN)
 

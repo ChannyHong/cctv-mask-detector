@@ -276,6 +276,19 @@ class MTCNN(nn.Module):
         else:
             return faces
 
+    def detect_face_box_pairs(self, img):
+        faces = self.forward(img)
+        boxes = self.detect(img)
+    
+        if faces is not None:
+            if faces.size()[0] == 1:
+                faces = torch.squeeze(faces)
+                boxes = boxes.squeeze(boxes)
+
+            return zip(faces, boxes)
+        else:
+            return None
+
     def detect_face_tensor(self, img):
         batch_boxes, batch_points = detect_face_modified(
             img, self.min_face_size,
@@ -307,7 +320,7 @@ class MTCNN(nn.Module):
         return boxes, probs
         #return batch_boxes, batch_points
 
-    def detect(self, img, landmarks=False):
+    def detect(self, img, landmarks=False, return_prob=True):
         """Detect all faces in PIL image and return bounding boxes and optional facial landmarks.
 
         This method is used by the forward method and is also useful for face detection tasks
@@ -390,7 +403,10 @@ class MTCNN(nn.Module):
         if landmarks:
             return boxes, probs, points
 
-        return boxes, probs
+        if return_prob:
+            boxes, probs
+
+        return boxes
 
     def select_boxes(
         self, all_boxes, all_probs, all_points, imgs, method='probability', threshold=0.9,
