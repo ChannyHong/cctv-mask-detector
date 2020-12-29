@@ -43,7 +43,7 @@ Model Training
 1. Use the pretrained MTCNN face recognition model from [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) to extract faces.
 2. Train the mask detection classifier using the resulting faces from the previous step.
 
-[SHOW SIMPLE DIAGRAM HERE]
+<img src="images/model.png" weight="100">
 
 ## Implementation Code
 
