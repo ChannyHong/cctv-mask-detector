@@ -39,6 +39,8 @@ Data:
 - 'protected' class: from [this dataset](https://www.kaggle.com/harry418/dataset-for-mask-detection)
 - 'unprotected' class: from [this dataset](https://www.kaggle.com/harry418/dataset-for-mask-detection)
 
+<img src="images/class_examples.png" weight="100">
+
 Model Training
 1. Use the pretrained MTCNN face recognition model from [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) to extract faces.
 2. Train the mask detection classifier using the resulting faces from the previous step.
@@ -153,11 +155,9 @@ Now onto the real deal. We are going try testing our MTCNN face recognizer + mas
 
 ![](images/channy_in.gif)
 
-![](images/channy_out.gif)
+Right from the get-go, I can already kinda guess that our model might have a hard time detecting whether I am protected or not. Similar to concept drift, the live data that our model is going to see is very different from the kind fo 
 
-And now, the moment of truth! Let's try 
-
-Right from the get-go, it's very apparent that . Similar to concept drift, I suspect that our model is going to have a hard time dealing with the low resolution and the . Similar to concept drift, the difference in the distribution of this live data from the training dataset will 
+I suspect that our model is going to have a hard time dealing with the low resolution and the . Similar to concept drift, the difference in the distribution of this live data from the training dataset will 
 
 Since our footage is a video file, we are going to need to deconstruct them into individual frames before feeding them into our model. Then we draw bounding boxes + classify them frame by frame, and then we can reconstruct them back into video files for viewing. Upon deployment, this all can happen on-the-go using the live feed.
 
