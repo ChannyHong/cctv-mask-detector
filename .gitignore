@@ -4,3 +4,4 @@ test_dataset_boxes
 loss_graphs
 *.pt
 mask_dataset
+legacy_code

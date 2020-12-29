@@ -107,12 +107,12 @@ python rename_image_files.py \
 
 **Train Mask Detection Classifier**
 
-First, we create a 'models' folder where we will be storing the output .pt model file.
+Now, we create a 'models' folder where we will be storing the output .pt model file.
 ```
 mkdir models
 ```
 
-Now run the training script on the training dataset.
+Then, we run the training script on the training dataset.
 ```
 python train_mask_detector.py \
 --train_examples_path=mask_dataset/train \
@@ -130,15 +130,26 @@ Now, we are going to test our MTCNN face recognizer + mask detection CNN models 
 
 ```
 python test_detector.py \
---detector_model_path=models/test_end.pt \
+--detector_model_path=models/detector.pt \
 --test_examples_path=mask_dataset/test 
 ```
 
-If you get message like this, then we are all set!
+I got this message:
+```
+All done!
+num_true_positive:  148
+num_false_positive:  2
+num_true_negative:  44
+num_false_negative:  6
+num_correct:  192
+num_incorrect:  8
+Accuracy:  0.96
+```
+96%... I think it's good enough to move on for now!
 
 ## Preliminary Testing
 
-Now, we are going to test our MTCNN face recognizer + mask detection CNN models on our Arlo security camera footage. Here's a raw footage of me walking out of the office.
+Now onto the real deal. We are going try testing our MTCNN face recognizer + mask detection CNN model on our Arlo security camera footage. Here's a raw footage of me walking out of the office.
 
 [Channy gif]
 
