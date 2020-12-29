@@ -1,3 +1,19 @@
+# Copyright 2020 Superb AI, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Authors: Channy Hong
+
 
 import torch
 from torch import nn, tensor
@@ -9,6 +25,15 @@ from mtcnn import MTCNN
 from PIL import Image, ImageDraw
 
 from torchviz import make_dot
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--train_examples_path', type=str, help='Required: the path to the folder consisting of "protected" and "unprotected" train examples', required=True)
+parser.add_argument('--train_dataset_size_per_class', type=int, help='Required: the number of train examples in "protected" and "unprotected" folders (or the smaller of the two)', required=True)
+parser.add_argument('--batch_size_per_class', type=int, help='Required: the number of train examples to include in a batch per class', required=True)
+parser.add_argument('--detector_model_output_path', type=str, help='The path to save the trained detector model file', required=True)
+parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
 
 
 BATCH_SIZE = 8
@@ -274,10 +299,7 @@ def main():
 	#params = list(mtcnn.parameters()) + [lambda_iou, lambda_dist]
 	#optimizer = torch.optim.SGD(params, lr=0.0001)
 
-	optimizer = torch.optim.SGD([
-		{'params': mtcnn.parameters()}#,
-		#{'params': [lambda_iou, lambda_dist], 'lr': 0.00001}
-		], lr=0.0001)
+	optimizer = torch.optim.SGD([{'params': mtcnn.parameters()}], lr=0.0001)
 
 	# Training loop
 	for epoch in range(200):
@@ -321,7 +343,7 @@ def main():
 			#model_arch.format = 'png'
 			#model_arch.render("loss_graphs/epoch{}-iter{}-loss.png".format(epoch, iteration_num))
 
-			print('Epoch: {} | Iteration: {} | Loss: {} \n.\n.\n.\n.\n.'.format(epoch, iteration_num, loss))
+			print('Epoch: {} | Iteration: {} | Loss: {}'.format(epoch, iteration_num, loss))
 
 			# Zero gradients, perform a backward pass, and update the weights.
 			optimizer.zero_grad()

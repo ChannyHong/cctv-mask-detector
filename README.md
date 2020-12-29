@@ -73,22 +73,21 @@ mask_dataset
         L ...
 ```
 
-**Extract Face Bounding Boxes**
-
-```
-python extract_faces.py
-```
-
 **Train Mask Detection Classifier**
 
 First, we create a 'models' folder where we will be storing the output .pt model file.
 ```
-mkdir model_files
+mkdir models
 ```
 
 Now run the training script on the training dataset.
 ```
-python train_mask_detection_model.py
+python train_mask_detector.py \
+--train_examples_path=mask_dataset/train \
+--train_dataset_size_per_class=500 \
+--batch_size_per_class=4 \
+--num_epochs=50 \
+--detector_model_output_path=models/detector.pt
 ```
 
 When the training is complete, the output .pt model file will be in our 'models' folder. 
@@ -98,8 +97,9 @@ When the training is complete, the output .pt model file will be in our 'models'
 Now, we are going to test our MTCNN face recognizer + mask detection CNN models on the test dataset.
 
 ```
-python test_detection_model.py \
---data_dir=mask_dataset
+python test_detector.py \
+--detector_model_path=models/test_end.pt \
+--test_examples_path=mask_dataset/test 
 ```
 
 ## Preliminary Testing

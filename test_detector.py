@@ -1,17 +1,40 @@
-import json
+# Copyright 2020 Superb AI, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Authors: Channy Hong
+
+
+
 import random
 import os
 
 from mtcnn import MTCNN
-from PIL import Image, ImageDraw
+from PIL import Image
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from torchvision import transforms
-from torchviz import make_dot
+import argparse
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--detector_model_path', type=str, help='Required: the path to the detector .pt model file', required=True)
+parser.add_argument('--test_examples_path', type=str, help='Required: the path to the folder consisting of "protected" and "unprotected" test examples', default="mask_dataset/test")
+parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
+
+args = parser.parse_args()
 
 class Detector(nn.Module):
     def __init__(self, pretrained_model_path):
@@ -25,13 +48,12 @@ class Detector(nn.Module):
         self.load_state_dict(state_dict)
 
     def forward(self, x):
-        print(x)
         in_size = x.size(0)
         x = F.relu(self.mp(self.conv1(x)))
         x = F.relu(self.mp(self.conv2(x)))
         x = x.view(in_size, -1)  # flatten the tensor
         x = self.fc(x)
-        return F.sigmoid(x)
+        return torch.sigmoid(x)
 
 
 def main():
@@ -46,19 +68,18 @@ def main():
         device=device, keep_all=True
     )
 
-    detector = Detector(pretrained_model_path="models/test_end.pt")
+    detector = Detector(pretrained_model_path=args.detector_model_path)
 
-    test_image_dir = "mask_dataset/test"
+    test_image_dir = args.test_examples_path
 
     y_pred = []
     y_data = []
 
     protected_files = os.listdir(os.path.join(test_image_dir, "protected"))
-    #protected_files.remove(".DS_Store")
+    protected_files.remove(".DS_Store")
 
     unprotected_files = os.listdir(os.path.join(test_image_dir, "unprotected"))
-    #unprotected_files.remove(".DS_Store")
-
+    unprotected_files.remove(".DS_Store")
 
     # LOAD TEST EXAMPLES
     test_examples = []
@@ -95,8 +116,6 @@ def main():
     # SHUFFLE TEST EXAMPLES
     random.shuffle(test_examples)
 
-
-
     # CHECK THE ANSWERS
     num_true_positive = 0
     num_false_positive = 0
@@ -105,8 +124,10 @@ def main():
     num_false_negative = 0
 
     for image, label in test_examples:
-        print(image)
-        print(label)
+        image = [image]
+        image = torch.stack(image)
+        image = torch.squeeze(image, 1)
+
         pred = detector(image)
 
         # prediction = positive (protected)
@@ -116,12 +137,12 @@ def main():
             elif label == 0:
                 num_false_positive += 1
 
+        # prediction = negative (unprotected)
         elif pred < 0.5:
             if label == 0:
                 num_true_negative += 1
             elif label == 1:
                 num_false_negative += 1
-
 
     # PRINT RESULTS
     print("All done!")
@@ -131,17 +152,12 @@ def main():
     print("num_false_negative: ", num_false_negative)
 
     num_correct = num_true_positive + num_true_negative
-    num_incorrect = num_true_positive + num_true_negative
+    num_incorrect = num_false_positive + num_false_negative
 
     print("num_correct: ", num_correct)
     print("num_incorrect: ", num_incorrect)
 
     print("Accuracy: ", float(num_correct) / float(num_correct + num_incorrect))
-
-        
-
-
-
 
 if __name__ == "__main__":
     main()

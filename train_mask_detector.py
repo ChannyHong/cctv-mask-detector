@@ -1,8 +1,25 @@
+# Copyright 2020 Superb AI, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Authors: Channy Hong
+
+
 import json
 import os
 
 from mtcnn import MTCNN
-from PIL import Image, ImageDraw
+from PIL import Image
 
 import torch
 import torch.nn as nn
@@ -11,7 +28,24 @@ import torch.nn.functional as F
 from torchvision import transforms
 from torchviz import make_dot
 
-BATCH_SIZE_PER_CLASS = 4
+import argparse
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--train_examples_path', type=str, help='Required: the path to the folder consisting of "protected" and "unprotected" train examples', default="mask_dataset/train")
+parser.add_argument('--train_dataset_size_per_class', type=int, help='Required: the number of train examples in "protected" and "unprotected" folders (or the smaller of the two)', default=500)
+parser.add_argument('--batch_size_per_class', type=int, help='Required: the number of train examples to include in a batch per class', default=4)
+parser.add_argument('--num_epochs', type=int, help='Required: the number of epochs to run training', default=50)
+parser.add_argument('--detector_model_output_path', type=str, help='The path to save the trained detector model file', default="models/detector.pt")
+parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
+
+
+
+args = parser.parse_args()
+
+
+
+BATCH_SIZE_PER_CLASS = args.batch_size_per_class
 
 
 
@@ -23,42 +57,13 @@ class Detector(nn.Module):
         self.mp = nn.MaxPool2d(4)
         self.fc = nn.Linear(640, 1)
 
-        #self.block1 = self.conv_block(c_in=3, c_out=256, dropout=0.1, kernel_size=5, stride=1, padding=2)
-        #self.block2 = self.conv_block(c_in=256, c_out=128, dropout=0.1, kernel_size=3, stride=1, padding=1)
-        #self.block3 = self.conv_block(c_in=128, c_out=64, dropout=0.1, kernel_size=3, stride=1, padding=1)
-        #self.fc = nn.Linear(102400, 1)
-        #self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
-
     def forward(self, x):
         in_size = x.size(0)
         x = F.relu(self.mp(self.conv1(x)))
         x = F.relu(self.mp(self.conv2(x)))
         x = x.view(in_size, -1)  # flatten the tensor
         x = self.fc(x)
-        #print("x: ", x)
-        #print("F.log_softmax(x): ", F.log_softmax(x))
-        return F.sigmoid(x)
-        #x = self.block1(x)
-        #x = self.maxpool(x)
-        #x = self.block2(x)
-        #x = self.block3(x)
-        #x = self.maxpool(x)
-        #x = x.view(in_size, -1) # flatten the tensor
-        #x = self.fc(x)
-        #return F.sigmoid(x)
-
-    def conv_block(self, c_in, c_out, dropout, **kwargs):
-        seq_block = nn.Sequential(
-            nn.Conv2d(in_channels=c_in, out_channels=c_out, **kwargs),
-            nn.BatchNorm2d(num_features=c_out),
-            nn.ReLU(),
-            nn.Dropout2d(p=dropout)
-        )
-        return seq_block
-
-
-def normalize(tti, itt, tensor):
-    return itt(tti(tensor))
+        return torch.sigmoid(x)
 
 
 def main():
@@ -66,27 +71,31 @@ def main():
     #device = "cpu"
     print('Running on device: {}'.format(device))
 
-    mtcnn = MTCNN(
-        image_size=160, margin=0, min_face_size=20,
-        thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
-        device=device, keep_all=True#, pretrained_model_path="test.pt"
-    )
+
+    if args.mtcnn_model_path:
+        mtcnn = MTCNN(
+            image_size=160, margin=0, min_face_size=20,
+            thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
+            device=device, keep_all=True, pretrained_model_path=args.mtcnn_model_path
+        )
+    else:
+        mtcnn = MTCNN(
+            image_size=160, margin=0, min_face_size=20,
+            thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
+            device=device, keep_all=True
+        )
 
     detector = Detector()
 
-    image_to_tensor = transforms.ToTensor()
-    tensor_to_image = transforms.ToPILImage(mode="RGB")
-
-    train_image_dir = "mask_dataset/train"
-    train_dataset_size = 500
+    train_image_dir = args.train_examples_path
+    train_dataset_size = args.train_dataset_size_per_class
 
     criterion = nn.BCELoss() # binary cross entropy
 
     optimizer = torch.optim.Adam(detector.parameters(), lr=0.001)
 
-
     # Training loop
-    for epoch in range(50):
+    for epoch in range(args.num_epochs):
 
         # calculate how many iterations in the epoch
         iterations = int(train_dataset_size/BATCH_SIZE_PER_CLASS)
@@ -107,13 +116,11 @@ def main():
                     # multiple protected faces in the image
                     if protected_faces.size()[0] > 1:
                         for protected_face in protected_faces:
-                            #protected_face = normalize(tensor_to_image, image_to_tensor, protected_face)
                             x_data.append(protected_face)
                             y_data.append(torch.tensor(1.0))
                     # one protected face in the image
                     else:
                         protected_face = torch.squeeze(protected_faces)
-                        #protected_face = normalize(tensor_to_image, image_to_tensor, protected_face)
                         x_data.append(protected_face)
                         y_data.append(torch.tensor(1.0))
 
@@ -124,13 +131,11 @@ def main():
                     # multiple unprotected faces in the image
                     if unprotected_faces.size()[0] > 1:
                         for unprotected_face in unprotected_faces:
-                            #unprotected_face = normalize(tensor_to_image, image_to_tensor, unprotected_face)
                             x_data.append(unprotected_face)
                             y_data.append(torch.tensor(0.0))
                     # one unprotected face in the image
                     else:
                         unprotected_face = torch.squeeze(unprotected_faces)
-                        #unprotected_face = normalize(tensor_to_image, image_to_tensor, unprotected_face)
                         x_data.append(unprotected_face)
                         y_data.append(torch.tensor(0.0))
 
@@ -161,7 +166,7 @@ def main():
             #if loss < 0.1:
             #    torch.save(detector.state_dict(), "./test_ep{}_iter{}_loss{}.pt".format(epoch, iteration_num, loss))
 
-    torch.save(detector.state_dict(), "models/test_end.pt")
+    torch.save(detector.state_dict(), args.detector_model_output_path)
 
 
 if __name__ == "__main__":
