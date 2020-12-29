@@ -153,9 +153,9 @@ Now onto the real deal. We are going try testing our MTCNN face recognizer + mas
 
 ![](images/channy-in.gif)
 
-![](images/channy-out.gif)
-
 And now, the moment of truth! Let's try 
+
+![](images/channy-out.gif)
 
 Right from the get-go, it's very apparent that . Similar to concept drift, I suspect that our model is going to have a hard time dealing with the low resolution and the . Similar to concept drift, the difference in the distribution of this live data from the training dataset will 
 
