@@ -9,5 +9,5 @@ image_list = os.listdir(args.rename_files_dir)
 counter = 1
 
 for image in image_list:
-	os.rename(image, str(counter) + ".jpeg")
+	os.rename(os.path.join(args.rename_files_dir, image), os.path.join(args.rename_files_dir, str(counter) + ".jpeg"))
 	counter += 1

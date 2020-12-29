@@ -89,7 +89,21 @@ mask_dataset
         L ...
 ```
 
-In my case, I allocated 500 images per class as train examples (1000 images for training in total) and the rest as test examples. Furthermore, I 
+In my case, I allocated 500 images per class as train examples (1000 images for training in total) and the rest as test examples. Furthermore, I renamed all the image files in each of the 4 folders to be numerically ascending from 1, by running the following script.
+
+```
+python rename_image_files.py \
+--rename_files_dir=mask_dataset/train/protected
+
+python rename_image_files.py \
+--rename_files_dir=mask_dataset/train/unprotected
+
+python rename_image_files.py \
+--rename_files_dir=mask_dataset/test/protected
+
+python rename_image_files.py \
+--rename_files_dir=mask_dataset/test/unprotected
+```
 
 **Train Mask Detection Classifier**
 
