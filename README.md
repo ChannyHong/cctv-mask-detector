@@ -154,10 +154,20 @@ Accuracy:  0.96
 Now onto the real deal. We are going try testing our MTCNN face recognizer + mask detection CNN model on our Arlo security camera footage. Here's a raw footage of me walking into the office.
 
 ![](images/channy_in.gif)
+![](images/channy_out.gif)
 
-Right from the get-go, I can already kinda guess that our model might have a hard time detecting whether I am protected or not. Similar to concept drift, the live data that our model is going to see is very different from the kind fo 
+Right from the get-go, I can already kinda guess that our model might have a hard time doing its job detecting whether my face is protected by a mask or not. Similar to concept drift, the live data that our model is going to see here is very different from the data it was trained on, and so it might behave all funky. For instance, because of the angle that our Arlo camera is pointing at, I suspect that the current MTCNN might have a bit of a trouble identifying faces at all. But we won't know until we try, so let's try!
 
-I suspect that our model is going to have a hard time dealing with the low resolution and the . Similar to concept drift, the difference in the distribution of this live data from the training dataset will 
+```
+
+
+```
+
+This script starts by deconstructing the
+
+
+Let's start by making a folder first that is going to store our 
+
 
 Since our footage is a video file, we are going to need to deconstruct them into individual frames before feeding them into our model. Then we draw bounding boxes + classify them frame by frame, and then we can reconstruct them back into video files for viewing. Upon deployment, this all can happen on-the-go using the live feed.
 
