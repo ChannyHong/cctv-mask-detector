@@ -108,13 +108,14 @@ def main():
 
                 pred = detector(face)
 
-                draw.rectangle(box.tolist(), outline=(255, 0, 0), width=3)
-                # draw label here too
-
+                # If protected, draw green bounding box and place 'protected' on top
                 if pred >= 0.5:
+                    draw.rectangle(box.tolist(), outline=(0, 255, 0), width=3)
                     draw.text((box[0], box[1]-15), "protected", (255, 255, 255))
 
+                # If unprotected, draw red bounding box and place 'unprotected' on top
                 elif pred < 0.5:
+                    draw.rectangle(box.tolist(), outline=(255, 0, 0), width=3)
                     draw.text((box[0], box[1]-15), "unprotected", (255, 255, 255))
 
         annotated_frames.append(image_annotated)
