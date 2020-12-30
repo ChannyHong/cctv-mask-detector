@@ -111,6 +111,12 @@ def main():
                 draw.rectangle(box.tolist(), outline=(255, 0, 0), width=3)
                 # draw label here too
 
+                if pred >= 0.5:
+                    draw.text((box[0], box[1]-15), "protected", (255, 255, 255))
+
+                elif pred < 0.5:
+                    draw.text((box[0], box[1]-15), "unprotected", (255, 255, 255))
+
         annotated_frames.append(image_annotated)
 
         # get the next frame
@@ -122,8 +128,6 @@ def main():
     #video = cv2.VideoWriter(args.output_path,cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
     video = cv2.VideoWriter(args.output_path, -1, 12, (width, height))
 
-    print("annotated_frames", annotated_frames)
-
     for annotated_frame in annotated_frames:
 
         # Convert PIL Image back to cv2 image
@@ -131,7 +135,6 @@ def main():
 
         # Convert RGB to BGR 
         upload_frame = cv2.cvtColor(np.asarray(upload_frame), cv2.COLOR_RGB2BGR)
-        print(upload_frame)
 
         video.write(upload_frame)
 

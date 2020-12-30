@@ -174,15 +174,15 @@ python cctv_mask_detector.py \
 --output_path=annotated_footage/annotated_channy_in.mp4
 ```
 
-The annotated vidoes should now be in the 'annotated_footage' folder. As an example:
+The annotated vidoes should now be in the 'annotated_footage' folder. Here's what I have:
 
 ![](images/annotated_channy_in.gif)
 
-As expected, our model does a terrible job at the moment even placing bounding boxes around... But at least the face  What should we do next?
+As expected, our MTCNN model does a terrible job at the moment identifying the face... But at least the face is being recognized each time, except the model is putting bounding boxes around way too many thing. What should I do next?
 
 ## Finetuning To The Rescue (MTCNN)
 
-So the very first (and a big one at that) problem we have is that the MTCNN face recognizer is not even picking up on folks' faces. This is a big problem, since our mask detection classifier very much depends on the output bounding boxes.
+So the very first (and a big one at that) problem we have is that our MTCNN face recognizer is not even picking up on folks' faces. This is a big problem, since our mask detection classifier very much depends on the output bounding boxes.
 
 Okay, so it seems like we're going to need to annotate some live data on the go in order to finetune our MTCNN face recognizer. Time to unlock the powers of Superb AI's Suite!
 
