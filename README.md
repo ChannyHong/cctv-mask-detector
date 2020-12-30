@@ -162,19 +162,18 @@ This script starts by deconstructing the Arlo footage (.mp4 file) into individua
 Let's first make a directory wherein we'll save the annotated footage.
 
 ```
-mkdir annotated_footage
-
+mkdir annotated_footages
 ```
 Now, let's run the script.
 
 ```
 python cctv_mask_detector.py \
 --detector_model_path=models/detector.pt \
---footage_path=footage/example.mp4 \
---output_path=annotated_footage/annotated_channy_in.mp4
+--footage_path=footages/channy_in.mp4 \
+--output_path=annotated_footages/annotated_channy_in.mp4
 ```
 
-The annotated vidoes should now be in the 'annotated_footage' folder. Here's what I have:
+The annotated vidoes should now be in the 'annotated_footages' folder. Here's what I have:
 
 ![](images/annotated_channy_in.gif)
 
@@ -182,21 +181,21 @@ As expected, our MTCNN model does a terrible job at the moment identifying the f
 
 ## Finetuning To The Rescue (MTCNN)
 
-So the very first (and a big one at that) problem we have is that our MTCNN face recognizer is not even picking up on folks' faces. This is a big problem, since our mask detection classifier very much depends on the output bounding boxes.
+So the very first (and a big one at that) problem we have is that our MTCNN face recognizer is placing bounding boxes around way too many things. This is a big problem, since our mask detection classifier very much depends on the output bounding boxes. We want to finetune the MTCNN model to have it only place bounding boxes around faces.
 
-Okay, so it seems like we're going to need to annotate some live data on the go in order to finetune our MTCNN face recognizer. Time to unlock the powers of Superb AI's Suite!
+Okay, so it seems like we're going to need to annotate some live data on the go in order to finetune our MTCNN face recognizer. Time to unlock the powers of *Superb AI's Suite*!
 
-First log into Superb AI's [Suite](https://suite.superb-ai.com/) (make a free account if you don't have one already) and make a new project. I chose 'image' as data type and 'box' as annotation type. I then added 3 classes to the project: 'correctly_masked', 'incorrectly_masked', and 'not_masked'.
+First log into Superb AI's [Suite](https://suite.superb-ai.com/) (make a free account if you don't have one already) and make a new project. I chose 'image' as data type and 'box' as annotation type. I then added 2 classes to the project: 'protected' and 'unprotected'. For finetuning the MTCNN, we only need the bounding box coordinates, but we're going to classify the boxes as well in case we want to finetune the mask detector model further too.
 
 EDIT: You can now use Suite's video data type to streamline the annotation process even more!
 
-Then, in order to streamline this workflow, we are now going to hook our project to with our local dev environment. First, if you don't have the Suite CLI installed already, run:
+Then, in order to streamline this workflow, we are now going to hook our project to with our local dev environment, so that we can use the CLI and Python SDK. First, if you don't have the Suite CLI installed already, run:
 
 ```
 pip install spb-cli
 ```
 
-Then, we are going to need to authenticate our dev environment to the project. Get the account 'Access Key' from 'My Account > Advanced' menu, and keep it handy for the following command:
+Then, we are going to need to authenticate our dev environment to the project. Get the account 'Access Key' from 'My Profile > Advanced' menu, and keep it handy for the following command:
 
 ```
 spb configure
@@ -204,10 +203,22 @@ Suite Account Name: [your account name, then press Enter]
 Access Key: [the access key, then press Enter]
 ``` 
 
-Now, we are going to upload our deconstructed frames onto Suite so we can distribute
+Now, we are going to upload the live data footages we want to label and use to finetune our MTCNN model. In order to do so, we first need to turn the footage video files into frame by frame image files that we can upload to the Suite that we can label. We start by making a folder to store these footage frame image files.
+```
+mkdir footages_frames
+```  
+Then run this script to deconstruct the footage video files into frame by frame image files:
+```
+python footages_to_frames.py \
+--footage_dir=footages \
+--output_dir=footages_frames \
+--frames_per_extract=10
+```
+
+Here, we are extracting 1 image file per 10 frames (skipping 9 frames each time). Now, we are going to upload our deconstructed frames onto Suite so we can distribute
 
 ```
-spb upload arlo_footage/deconstructed_frames
+spb upload footages_frames
 Project Name: [project name, then press Enter]
 Dataset Name: [dataset name, then press Enter]
 ``` 
