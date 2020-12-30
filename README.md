@@ -176,7 +176,7 @@ python cctv_mask_detector.py \
 
 The annotated vidoes should now be in the 'annotated_footage' folder. Here's what I have:
 
-![](images/annotated_channy_in.gif)
+![](images/annotated_channy_inn.gif)
 
 As expected, our MTCNN model does a terrible job at the moment identifying the face... But at least the face is being recognized each time, except the model is putting bounding boxes around way too many thing. What should I do next?
 
