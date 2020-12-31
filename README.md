@@ -187,6 +187,8 @@ Okay, so it seems like we're going to need to annotate some live data on the go 
 
 First log into Superb AI's [Suite](https://suite.superb-ai.com/) (make a free account if you don't have one already) and make a new project. I chose 'image' as data type and 'box' as annotation type. I then added 2 classes to the project: 'protected' and 'unprotected'. For finetuning the MTCNN, we only need the bounding box coordinates, but we're going to classify the boxes as well in case we want to finetune the mask detector model further too.
 
+![](images/create_project.gif)
+
 EDIT: You can now use Suite's video data type to streamline the annotation process even more!
 
 Then, in order to streamline this workflow, we are now going to hook our project to with our local dev environment, so that we can use the CLI and Python SDK. First, if you don't have the Suite CLI installed already, run:
@@ -202,6 +204,8 @@ spb configure
 Suite Account Name: [your account name, then press Enter]
 Access Key: [the access key, then press Enter]
 ``` 
+
+![](images/api_key.gif)
 
 Now, we are going to upload the live data footages we want to label and use to finetune our MTCNN model. In order to do so, we first need to turn the footage video files into frame by frame image files that we can upload to the Suite that we can label. We start by making a folder to store these footage frame image files.
 ```
@@ -224,11 +228,11 @@ Project Name: [project name, then press Enter]
 Dataset Name: [dataset name, then press Enter]
 ``` 
 
-[uploading gif]
+![](images/upload.gif)
 
 For this project, I recruited the help of Kevin, Ike, Jack for the labeling process. From the Suite 'label list' section, I divied up the images into 4 cohorts and we each took about an hour labeling them (bounding box around each face).
 
-[labeling example gif]
+![](images/labeling.gif)
 
 Now, let's export the labels so we can use them for finetuning:
 
@@ -257,7 +261,7 @@ python finetune_mtcnn.py \
 Okay, let's try using this finetuned MTCNN model to see how our entire system does. We are going to use the script that outputs an annotated video again, but this time using our custom MTCNN model as well.
 ```
 python cctv_mask_detector.py \
---mtcnn_model_path=mtcnn.pt \
+--mtcnn_model_path=models/mtcnn.pt \
 --detector_model_path=models/detector.pt \
 --footage_path=footages/channy_in.mp4 \
 --output_path=annotated_footages/annotated_channy_in.mp4
@@ -267,24 +271,33 @@ python cctv_mask_detector.py \
 
 The face recognizing part is working great now, but the mask detection portion is still quite dysfunctional... Well, good thing we did classification (on top of bounding boxes) while we were annotating! Time to put these pieces of data to use as well!
 
-## Finetuning Cont'd (Mask Detection CNN)
+## Finetuning Cont'd (Mask Detector)
 
-We are now going to finetune our using the bounding box classification data we have from the labels. Same as before, we first extract the faces from the Arlo deconstructed frames using the following script:
+We are now going to finetune our mask detector using the bounding box classification data we have from the labels. Same as before, we first extract the faces from the Arlo deconstructed frames using the following script:
 ```
 python extract_faces.py
 ```
 
-Then, we finetune our mask detection CNN model further:
+Then, we finetune our mask detection CNN model further, by using the training script we used earlier, but by :
 ```
-python train_mask_detection_model.py
+python train_mask_detector.py \
+--train_examples_path=mask_dataset/train \
+--train_dataset_size_per_class=500 \
+--batch_size_per_class=4 \
+--num_epochs=50 \
+--pretrained_detector=
+--detector_model_output_path=models/finetuned_detector.pt
 ```
 
 ## Final Result
 
 Now let's test out our fully finetuned model on the Arlo footage frames:
 ```
-python test.py \
---data_dir=arlo_footage/deconstructed_frames
+python cctv_mask_detector.py \
+--mtcnn_model_path=finetuned_mtcnn.pt \
+--detector_model_path=models/finetuned_detector.pt \
+--footage_path=footages/channy_in.mp4 \
+--output_path=annotated_footages/annotated_channy_in.mp4
 ``` 
 
 Reconstruct video files:

@@ -38,6 +38,7 @@ parser.add_argument('--batch_size_per_class', type=int, help='Required: the numb
 parser.add_argument('--num_epochs', type=int, help='Required: the number of epochs to run training', default=50)
 parser.add_argument('--detector_model_output_path', type=str, help='The path to save the trained detector model file', default="models/detector.pt")
 parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
+parser.add_argument('--pretrained_detector_model_path', type=str, help='Optional: the path to the pretrained detector .pt model file', default=None)
 
 
 
@@ -50,12 +51,16 @@ BATCH_SIZE_PER_CLASS = args.batch_size_per_class
 
 
 class Detector(nn.Module):
-    def __init__(self):
+    def __init__(self, pretrained_model_path=None):
         super(Detector, self).__init__()
         self.conv1 = nn.Conv2d(3, 5, kernel_size=5)
         self.conv2 = nn.Conv2d(5, 10, kernel_size=5)
         self.mp = nn.MaxPool2d(4)
         self.fc = nn.Linear(640, 1)
+
+        if pretrained_model_path:
+            state_dict = torch.load(pretrained_model_path)
+            self.load_state_dict(state_dict)
 
     def forward(self, x):
         in_size = x.size(0)

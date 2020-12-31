@@ -37,15 +37,16 @@ parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to 
 args = parser.parse_args()
 
 class Detector(nn.Module):
-    def __init__(self, pretrained_model_path):
+    def __init__(self, pretrained_model_path=None):
         super(Detector, self).__init__()
         self.conv1 = nn.Conv2d(3, 5, kernel_size=5)
         self.conv2 = nn.Conv2d(5, 10, kernel_size=5)
         self.mp = nn.MaxPool2d(4)
         self.fc = nn.Linear(640, 1)
 
-        state_dict = torch.load(pretrained_model_path)
-        self.load_state_dict(state_dict)
+        if pretrained_model_path:
+            state_dict = torch.load(pretrained_model_path)
+            self.load_state_dict(state_dict)
 
     def forward(self, x):
         in_size = x.size(0)
