@@ -1,9 +1,7 @@
 .DS_Store
-test_dataset
-test_dataset_boxes
-loss_graphs
 *.pt
-mask_dataset
 legacy_code
+footages
 footages_frames
-footages_frames_2
+models
+mask_dataset
