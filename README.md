@@ -175,7 +175,7 @@ python cctv_mask_detector.py \
 --output_path=annotated_footages/annotated_channy_in.mp4
 ```
 
-The annotated vidoes should now be in the 'annotated_footages' folder. Here's what I have:
+The annotated videos should now be in the 'annotated_footages' folder. Here's what I have:
 
 ![](images/annotated_channy_in.gif)
 
@@ -232,7 +232,7 @@ Dataset Name: [dataset name, then press Enter]
 
 ![](images/upload.gif)
 
-For this project, I recruited the help of Kevin, Ike, Jack for the labeling process. From Suite's label list' section, I divied up the images into 4 cohorts; it took us less than a day to finish labeling them (bounding box + classification).
+For this project, I recruited the help of a few of my friends for the labeling process. From Suite's label list' section, I divied up the images into 4 cohorts; it took us less than a day to finish labeling them (bounding box + classification).
 
 ![](images/labeling.gif)
 
@@ -307,7 +307,7 @@ Now let's talk about deploying this model long-term in an easily maintainable wa
 
 ![](images/system_flow.png)
 
-We can keep collecting these frames and store them in some folder, and when that folder is sufficiently filled, a regularly scheduled cron job could detect that it is full, trigger a model finetuning / training, and delete the folder's contents for the next batch of 'low confidence' frames to process.
+We can keep collecting these frames and store them in a folder, and when that folder is sufficiently filled, a regularly scheduled cron job could detect that it is full, trigger a model finetuning / training, and delete the folder's contents for the next batch of 'low confidence' frames to process.
 
 Then, we can use Superb AI's Suite to quickly distribute the annotation work to the project labelers, while the manager can continually check-in on the project analytics and conduct quality assurance. When the labeling is complete, the annotations can be re-introduced to the training cycle to further finetune / train the deployed models.
 
