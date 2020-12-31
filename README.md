@@ -243,7 +243,6 @@ Project Name: [project name, then press Enter]
 
 The after unzipping the downloaded file, I renamed the folder to 'labels'.
 
-
 Okay, we are now ready to rumble with the finetuning process. I had to tinker with with [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) quite a bit to isolate the MTCNN model. I also designed a custom loss function for this funetuning script. Anyways, run the following script to begin finetuning our MTCNN face recognizer model:
 
 ```
@@ -253,13 +252,13 @@ python finetune_mtcnn.py \
 --images_dir=footages_frames \
 --batch_size=8 \
 --num_epochs=50 \
---mtcnn_model_output_path=models/mtcnn.pt
+--mtcnn_model_output_path=models/finetuned_mtcnn.pt
 ```
 
 Okay, let's try using this finetuned MTCNN model to see how our entire system does. We are going to use the script that outputs an annotated video again, but this time using our custom MTCNN model as well.
 ```
 python cctv_mask_detector.py \
---mtcnn_model_path=models/mtcnn.pt \
+--mtcnn_model_path=models/finetuned_mtcnn.pt \
 --detector_model_path=models/detector.pt \
 --footage_path=footages/channy_in.mp4 \
 --output_path=annotated_footages/annotated_channy_in.mp4
@@ -276,20 +275,21 @@ We are now going to finetune our mask detector using the bounding box classifica
 python extract_faces.py
 ```
 
-Then, we finetune our mask detection CNN model further, by using the training script we used earlier, but by :
+Then, we finetune our mask detection CNN model further, by using the training script we used earlier. Here, instead of using the default MTCNN, we use the finetuned version we output earlier. And of course, we also use the weights of the detector model we trained earlier to initialize (hence the finetuning):
 ```
 python train_mask_detector.py \
 --train_examples_path=mask_dataset/train \
 --train_dataset_size_per_class=500 \
 --batch_size_per_class=4 \
 --num_epochs=50 \
---pretrained_detector=
+--mtcnn_model_path=models/finetuned_mtcnn.pt \
+--pretrained_detector_model_path=models/detector.pt \
 --detector_model_output_path=models/finetuned_detector.pt
 ```
 
 ## Final Result
 
-Now let's test out our fully finetuned model on the Arlo footage frames:
+Now let's test out our fully finetuned MTCNN + mask detector models:
 ```
 python cctv_mask_detector.py \
 --mtcnn_model_path=finetuned_mtcnn.pt \
@@ -300,16 +300,11 @@ python cctv_mask_detector.py \
 
 ![](images/finetuned2_channy_in.gif)
 
-Hooray, now the model seems to be a great job both recognizing faces and classifying whether folks are correctly masked, incorrectly masked, or not masked at all!
+Hooray, now the model seems to be a great job both recognizing faces and classifying whether the face is protected or not.
 
 ## Integrating Labeling Work Into MLOps Using Superb AI's Suite
 
-[MLOPs code]
-
-use a Cron job 
-
-Set up a cron job to 
-
+What was remarkable in this 
 
 
 
