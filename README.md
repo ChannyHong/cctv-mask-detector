@@ -311,4 +311,4 @@ We can keep collecting these frames and store them in a folder, and when that fo
 
 Then, we can use Superb AI's Suite to quickly distribute the annotation work to the project labelers, while the manager can continually check-in on the project analytics and conduct quality assurance. When the labeling is complete, the annotations can be re-introduced to the training cycle to further finetune / train the deployed models.
 
-As machine learning becomes more and more prevalent in today's tech stacks, the flexibility and 'integratibility' of data labeling - by far the most human labor intensive part of the process - is key to a successful deployment of an ML project. And Superb AI's Suite can help you get there.
+As machine learning becomes more and more prevalent in today's tech stacks, the flexibility and 'integratibility' of data labeling - by far the most human labor intensive part of the process - is key to a successful deployment of an ML project. And [Superb AI's Suite](https://suite.superb-ai.com/) can help you get there.
