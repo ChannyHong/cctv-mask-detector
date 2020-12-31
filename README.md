@@ -37,7 +37,7 @@ Bootstrapping all this without having done any data labeling on our end, we alre
 
 Data:
 - 'protected' class: from [this dataset](https://www.kaggle.com/harry418/dataset-for-mask-detection)
-- 'unprotected' class: from [same dataset](https://www.kaggle.com/harry418/dataset-for-mask-detection)
+- 'unprotected' class: from [the same dataset](https://www.kaggle.com/harry418/dataset-for-mask-detection)
 
 <img src="images/class_examples.png" weight="100">
 
