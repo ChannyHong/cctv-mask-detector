@@ -303,26 +303,12 @@ Hooray! Now the model seems to be doing a good job both recognizing the face and
 
 To recap, I was able to train and deploy a decently working model that detects whether folks' faces are protected or not as they enter the view of the security camera. I was able to quickstart the training process by using a pretrained MTCNN face recognizier and using a publicliy available face mask dataset to train the mask detector. Then, when it was clear that the manual labeling of live data was necessary to finetune both components, I used the Suite to easily upload the images, distribute the workload, and download the labels.
 
-Now let's talk about deploying this model long-term in an easily maintainable way. If we take the 'active-learning' approach, we would be interested in picking out 
-
-
-MTCNN: below some threshold probability , Detector-CNN: in-between )
-
-Then, we can 
-
-
-The most interesting aspect of working at 
-
-With a bit more 
-
-Let's say we continue to encounter edge cases that need addressing 
-
+Now let's talk about deploying this model long-term in an easily maintainable way. If we take the 'active-learning' approach, we would be interested in picking out the footage frames for which our model displays low confidence, and feed them back into the training loop to further finetune (or train from beginning outright) our two models. For instance, we could utilize the probability metric that our MTCNN provides alongside bounding boxes to set a bar for what this 'low confidence' exactly entails. For our mask detector, we could pick out examples for which the CNN's output value is around 0.5 (whereas 1.0 is 'protected' and 0.0 is 'unprotected'). 
 
 ![](images/system_flow.png)
 
+We can keep collecting these frames and store them in some folder, and when that folder is sufficiently filled, a regularly scheduled cron job could detect that it is full, trigger a model finetuning / training, and delete the folder's contents for the next batch of 'low confidence' frames to process.
 
+Then, we can use Superb AI's Suite to quickly distribute the annotation work to the project labelers, while the manager can continually check-in on the project analytics and conduct quality assurance. When the labeling is complete, the annotations can be re-introduced to the training cycle to further finetune / train the deployed models.
 
-
-
-
-
+As machine learning becomes more and more prevalent in today's tech stacks, the flexibility and integratibility of data labeling - by far the most human labor intensive part of the process - is key to a successful deployment of an ML project. And Superb AI's Suite can help you get there.
