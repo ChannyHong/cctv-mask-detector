@@ -5,3 +5,5 @@ loss_graphs
 *.pt
 mask_dataset
 legacy_code
+footages_frames
+footages_frames_2

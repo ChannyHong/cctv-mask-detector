@@ -218,41 +218,52 @@ python footages_to_frames.py \
 Here, we are extracting 1 image file per 10 frames (skipping 9 frames each time). Now, we are going to upload our deconstructed frames onto Suite so we can distribute
 
 ```
-spb upload footages_frames
+cd footages_frames
+spb upload dataset
 Project Name: [project name, then press Enter]
 Dataset Name: [dataset name, then press Enter]
 ``` 
+
+[uploading gif]
 
 For this project, I recruited the help of Kevin, Ike, Jack for the labeling process. From the Suite 'label list' section, I divied up the images into 4 cohorts and we each took about an hour labeling them (bounding box around each face).
 
 [labeling example gif]
 
-Now, let me export the labels so we can use them for the finetuning processes:
+Now, let's export the labels so we can use them for finetuning:
 
 ```
 spb download
 Project Name: [project name, then press Enter]
 ``` 
 
+The after unzipping the downloaded file, I renamed the folder to 'labels'.
+
+
 Okay, we are now ready to rumble with the finetuning process. I had to tinker with with [timesler's facenet-pytorch project](https://github.com/timesler/facenet-pytorch) quite a bit to isolate the MTCNN model. I also designed a custom loss function for this funetuning script. Anyways, run the following script to begin finetuning our MTCNN face recognizer model:
 
 ```
-python finetune_mtcnn.py
+python finetune_mtcnn.py \
+--metadata_dir=labels/meta/cctv-mask-detector-live-data \
+--labels_dir=labels/labels \
+--images_dir=footages_frames \
+--batch_size=8 \
+--num_epochs=50 \
+--mtcnn_model_output_path=models/mtcnn.pt
 ```
 
 [show gif of loss going down]
 
-Okay, let's try running our model again and seeing how it works
+Okay, let's try using this finetuned MTCNN model to see how our entire system does. We are going to use the script that outputs an annotated video again, but this time using our custom MTCNN model as well.
 ```
-python test.py \
---data_dir=arlo_footage/deconstructed_frames
+python cctv_mask_detector.py \
+--mtcnn_model_path=mtcnn.pt \
+--detector_model_path=models/detector.pt \
+--footage_path=footages/channy_in.mp4 \
+--output_path=annotated_footages/annotated_channy_in.mp4
 ``` 
 
-Reconstruct video files:
-```
-python reconstruct.py
---data_dir=arlo_footage/output_frames
-``` 
+![](gif..here...)
 
 The face recognizing part is working great now, but the mask detection portion is still quite dysfunctional... Well, good thing we did classification (on top of bounding boxes) while we were annotating! Time to put these pieces of data to use as well!
 
@@ -291,4 +302,13 @@ Hooray, now the model seems to be a great job both recognizing faces and classif
 ## Integrating Labeling Work Into MLOps Using Superb AI's Suite
 
 [MLOPs code]
+
+use a Cron job 
+
+Set up a cron job to 
+
+
+
+
+
 

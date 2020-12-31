@@ -24,19 +24,26 @@ import os
 from mtcnn import MTCNN
 from PIL import Image, ImageDraw
 
-from torchviz import make_dot
+#from torchviz import make_dot
 
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--train_examples_path', type=str, help='Required: the path to the folder consisting of "protected" and "unprotected" train examples', required=True)
-parser.add_argument('--train_dataset_size_per_class', type=int, help='Required: the number of train examples in "protected" and "unprotected" folders (or the smaller of the two)', required=True)
-parser.add_argument('--batch_size_per_class', type=int, help='Required: the number of train examples to include in a batch per class', required=True)
-parser.add_argument('--detector_model_output_path', type=str, help='The path to save the trained detector model file', required=True)
-parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
+parser.add_argument('--metadata_dir', type=str, help='Required: the path to the folder consisting of label metadata files', required=True)
+parser.add_argument('--labels_dir', type=str, help='Required: the path to the folder consisting of label files', required=True)
+parser.add_argument('--images_dir', type=str, help='Required: the path to the folder consisting of the images', required=True)
+
+parser.add_argument('--num_epochs', type=int, help='Required: the number of epochs to run training', required=True)
+parser.add_argument('--batch_size', type=int, help='Required: the number of images to include in a batch', required=True)
 
 
-BATCH_SIZE = 8
+parser.add_argument('--mtcnn_model_output_path', type=str, help='Required: the path to output the finetuned MTCNN model', required=True)
+parser.add_argument('--pretrained_mtcnn_model', type=str, help='Optional: the path to the custom MTCNN .pt model to start from', default=None)
+
+
+args = parser.parse_args()
+
+BATCH_SIZE = args.batch_size
 
 
 def iou(gt_box, pred_box): # gt_box = [top_left_x, top_left_y, width, height], pred_box = [top_left_x, top_left_y, bottom_right_x, bottom_right_y]
@@ -272,21 +279,26 @@ def criterion(y_pred, y_data, lambda_iou, lambda_dist):
 
 
 
-
-
-
 def main():
 	#device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	device = "cpu"
 	print('Running on device: {}'.format(device))
 
-	mtcnn = MTCNN(
-	    image_size=160, margin=0, min_face_size=20,
-	    thresholds=[0.1, 0.2, 0.2], factor=0.709, post_process=True,
-	    device=device, keep_all=True#, pretrained_model_path="test.pt"
-	)
+	if args.pretrained_mtcnn_model:
+		mtcnn = MTCNN(
+		    image_size=160, margin=0, min_face_size=20,
+		    thresholds=[0.1, 0.2, 0.2], factor=0.709, post_process=True,
+		    device=device, keep_all=True, pretrained_model_path=args.pretrained_mtcnn_model
+		)
+	else:
+		mtcnn = MTCNN(
+		    image_size=160, margin=0, min_face_size=20,
+		    thresholds=[0.1, 0.2, 0.2], factor=0.709, post_process=True,
+		    device=device, keep_all=True
+		)
 
-	train_image_list = os.listdir("../labeled_data/image_metadata")
+	train_image_list = os.listdir(os.path.join(args.meta_dir))
+
 	train_dataset_size = len(train_image_list)
 
 	#train_image_list.sort()
@@ -302,7 +314,7 @@ def main():
 	optimizer = torch.optim.SGD([{'params': mtcnn.parameters()}], lr=0.0001)
 
 	# Training loop
-	for epoch in range(200):
+	for epoch in range(args.num_epochs):
 
 		# calculate how many iterations in the epoch
 		iterations = int(train_dataset_size/BATCH_SIZE)
@@ -316,17 +328,17 @@ def main():
 
 			for i in range(batch_start_index, batch_start_index+BATCH_SIZE):
 				metadata_filename = train_image_list[i]
-				metadata_file_pointer = open(os.path.join("../labeled_data/image_metadata", metadata_filename), "r+")
+				metadata_file_pointer = open(os.path.join(args.meta_dir, metadata_filename), "r+")
 				metadata_dict = json.load(metadata_file_pointer)
 				metadata_file_pointer.close()
 				label_id = metadata_dict["label_id"]
 				
-				image_filename = metadata_filename[:-5]
-				image = Image.open(os.path.join("../labeled_data/images", image_filename))
+				image_filename = metadata_filename[:-5] + ".jpg"
+				image = Image.open(os.path.join(args.images_dir, image_filename))
 				x_data.append(image)
 
 				label_filename = "{}.json".format(label_id)
-				label_file_pointer = open(os.path.join("../labeled_data/labels", label_filename), "r+")
+				label_file_pointer = open(os.path.join(args.labels_dir, label_filename), "r+")
 				label_dict = json.load(label_file_pointer)
 				label_file_pointer.close()
 				label_objects = label_dict["result"]["objects"]
@@ -353,7 +365,7 @@ def main():
 			if loss < 0.1:
 				torch.save(mtcnn.state_dict(), "./test_ep{}_iter{}_loss{}.pt".format(epoch, iteration_num, loss))
 
-	torch.save(mtcnn.state_dict(), "./test_end.pt")
+	torch.save(mtcnn.state_dict(), args.mtcnn_model_output_path)
 
 
 if __name__ == "__main__":
