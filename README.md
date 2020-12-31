@@ -184,7 +184,7 @@ So the very first (and a big one at that) problem we have is that our MTCNN face
 
 Okay, so it seems like we're going to need to annotate some live data on the go in order to finetune our MTCNN face recognizer. Time to unlock the powers of *Superb AI's Suite*!
 
-First log into Superb AI's [Suite](https://suite.superb-ai.com/) (make a free account if you don't have one already) and make a new project. I chose 'image' as data type and 'box' as annotation type. I then added 2 classes to the project: 'protected' and 'unprotected'. For finetuning the MTCNN, we only need the bounding box coordinates, but we're going to classify the boxes as well in case we want to finetune the mask detector model further too.
+First log into the [Suite](https://suite.superb-ai.com/) (make a free account if you don't have one already) and make a new project. I chose 'image' as data type and 'box' as annotation type. I then added 2 classes to the project: 'protected' and 'unprotected'. For finetuning the MTCNN, we only need the bounding box coordinates, but we're going to classify the boxes as well, just in case we want to finetune the mask detector model later on too.
 
 ![](images/create_project.gif)
 
