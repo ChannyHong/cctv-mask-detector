@@ -265,7 +265,7 @@ python cctv_mask_detector.py \
 --output_path=annotated_footages/annotated_channy_in.mp4
 ``` 
 
-![](finetuned1_channy_in.gif)
+![](images/finetuned1_channy_in.gif)
 
 The face recognizing part is working great now, but the mask detection portion is still quite dysfunctional... Well, good thing we did classification (on top of bounding boxes) while we were annotating! Time to put these pieces of data to use as well!
 
@@ -298,7 +298,7 @@ python cctv_mask_detector.py \
 --output_path=annotated_footages/annotated_channy_in.mp4
 ``` 
 
-![](finetuned2_channy_in.gif)
+![](images/finetuned2_channy_in.gif)
 
 Hooray, now the model seems to be a great job both recognizing faces and classifying whether folks are correctly masked, incorrectly masked, or not masked at all!
 
