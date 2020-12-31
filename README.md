@@ -256,8 +256,6 @@ python finetune_mtcnn.py \
 --mtcnn_model_output_path=models/mtcnn.pt
 ```
 
-[show gif of loss going down]
-
 Okay, let's try using this finetuned MTCNN model to see how our entire system does. We are going to use the script that outputs an annotated video again, but this time using our custom MTCNN model as well.
 ```
 python cctv_mask_detector.py \
@@ -267,7 +265,7 @@ python cctv_mask_detector.py \
 --output_path=annotated_footages/annotated_channy_in.mp4
 ``` 
 
-![](gif..here...)
+![](finetuned1_channy_in.gif)
 
 The face recognizing part is working great now, but the mask detection portion is still quite dysfunctional... Well, good thing we did classification (on top of bounding boxes) while we were annotating! Time to put these pieces of data to use as well!
 
@@ -300,17 +298,9 @@ python cctv_mask_detector.py \
 --output_path=annotated_footages/annotated_channy_in.mp4
 ``` 
 
-Reconstruct video files:
-```
-python reconstruct.py
---data_dir=arlo_footage/output_frames
-``` 
+![](finetuned2_channy_in.gif)
 
 Hooray, now the model seems to be a great job both recognizing faces and classifying whether folks are correctly masked, incorrectly masked, or not masked at all!
-
-## Continuing Edge Cases
-
-[edge cases still appear... we need to continuosly integrate labeling]
 
 ## Integrating Labeling Work Into MLOps Using Superb AI's Suite
 
