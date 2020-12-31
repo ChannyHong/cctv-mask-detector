@@ -24,8 +24,6 @@ import os
 from mtcnn import MTCNN
 from PIL import Image, ImageDraw
 
-#from torchviz import make_dot
-
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -251,19 +249,6 @@ def criterion(y_pred, y_data, lambda_iou, lambda_dist):
 	lambda_dist_pos = torch.abs(lambda_dist)
 	final_dist = torch.mul(batch_avg_dist, lambda_dist_pos)
 
-	print("lambda_iou", lambda_iou)
-	print("lambda_dist", lambda_dist)
-
-	print("average_y_hat_len", float(sum(y_hat_len_list)) / float(len(y_hat_len_list)))
-	print("average_y_gt_len", float(sum(y_gt_len_list)) / float(len(y_gt_len_list)))
-
-	print("final_iou", final_iou)
-	print("final_dist", final_dist)
-
-	#batch_avg_diff = torch.mean(batch_diff_list)
-	#lambda_diff = Variable(torch.tensor(1.0), requires_grad=True)
-	#final_diff = torch.mul(batch_avg_diff, lambda_diff)
-
 	
 	#loss is avg_iou + avg_diff + avg_dist
 	loss = torch.add(final_iou, final_dist)
@@ -297,7 +282,7 @@ def main():
 		    device=device, keep_all=True
 		)
 
-	train_image_list = os.listdir(os.path.join(args.meta_dir))
+	train_image_list = os.listdir(args.meta_dir)
 
 	train_dataset_size = len(train_image_list)
 
@@ -351,10 +336,6 @@ def main():
 
 			loss = criterion(y_pred, y_data, lambda_iou, lambda_dist)
 			
-			#model_arch = make_dot(loss)
-			#model_arch.format = 'png'
-			#model_arch.render("loss_graphs/epoch{}-iter{}-loss.png".format(epoch, iteration_num))
-
 			print('Epoch: {} | Iteration: {} | Loss: {}'.format(epoch, iteration_num, loss))
 
 			# Zero gradients, perform a backward pass, and update the weights.
@@ -362,8 +343,8 @@ def main():
 			loss.backward()
 			optimizer.step()
 
-			if loss < 0.1:
-				torch.save(mtcnn.state_dict(), "./test_ep{}_iter{}_loss{}.pt".format(epoch, iteration_num, loss))
+			#if loss < 0.1:
+			#	torch.save(mtcnn.state_dict(), "./test_ep{}_iter{}_loss{}.pt".format(epoch, iteration_num, loss))
 
 	torch.save(mtcnn.state_dict(), args.mtcnn_model_output_path)
 

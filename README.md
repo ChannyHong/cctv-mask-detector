@@ -218,7 +218,7 @@ python footages_to_frames.py \
 --frames_per_extract=10
 ```
 
-Here, we are extracting 1 image file per 10 frames (skipping 9 frames each time). Now, we are going to upload our deconstructed frames onto Suite so we can distribute
+Here, we are extracting 1 image file per 10 frames (skipping 9 frames each time). Now, we are going to upload our deconstructed frames onto the Suite so we can assign the workload to the workers. 
 
 ```
 cd footages_frames
@@ -229,7 +229,7 @@ Dataset Name: [dataset name, then press Enter]
 
 ![](images/upload.gif)
 
-For this project, I recruited the help of Kevin, Ike, Jack for the labeling process. From the Suite 'label list' section, I divied up the images into 4 cohorts and we each took about an hour labeling them (bounding box around each face).
+For this project, I recruited the help of Kevin, Ike, Jack for the labeling process. From the Suite 'label list' section, I divied up the images into 4 cohorts and it took us less than a day to finish labeling them (bounding box around each face).
 
 ![](images/labeling.gif)
 
@@ -299,11 +299,27 @@ python cctv_mask_detector.py \
 
 ![](images/finetuned2_channy_in.gif)
 
-Hooray, now the model seems to be a great job both recognizing faces and classifying whether the face is protected or not.
+Hooray! Now the model seems to be doing a good job both recognizing the face and classifying whether it is protected or not.
 
 ## Integrating Labeling Work Into MLOps Using Superb AI's Suite
 
-What was remarkable in this 
+To recap, I was able to train and deploy a decently working model that detects whether folks' faces are protected or not as they enter the view of the security camera. I was able to quickstart the training process by using a pretrained MTCNN face recognizier and using a publicliy available face mask dataset to train the mask detector. Then, when it was clear that the manual labeling of live data was necessary to finetune both components, I used the Suite to easily upload the images, distribute the workload, and download the labels.
+
+Now let's talk about deploying this model long-term in an easily maintainable way. Without a doubt . If we take the 'active-learning' approach, we would be interested in  MTCNN: below some threshold probability , Detector-CNN: in-between )
+
+Then, we can 
+
+
+The most interesting aspect of working at 
+
+With a bit more 
+
+Let's say we continue to encounter edge cases that need addressing 
+
+
+
+
+
 
 
 
