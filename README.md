@@ -157,14 +157,13 @@ Now onto the real deal. We are going try testing our MTCNN face recognizer + mas
 
 Right from the get-go, I can already kinda guess that our model might have a hard time doing its job detecting whether my face is protected by a mask or not. Similar to concept drift, the live data that our model is going to see here is very different from the data it was trained on, and so it might behave all funky. For instance, because of the angle that our Arlo camera is pointing at, I suspect that the current MTCNN might have a bit of a trouble identifying faces at all. But we won't know until we try, so let's give it a try!
 
-This script starts by deconstructing the Arlo footage (.mp4 file) into individual frames, then run the frames through the MTCNN model to place bounding boxes around the faces & through the mask detector model to classify the face as protected or not, and place the label below the box. The script finishes by reconstructing the frames back into a video form that can be viewed.
-
 Let's first make a directory wherein we'll save the annotated footage.
 
 ```
 mkdir annotated_footages
 ```
-Now, let's run the script.
+
+The following script starts by deconstructing the Arlo footage (.mp4 file) into individual frames, then run the frames through the MTCNN model to place bounding boxes around the faces & through the mask detector model to classify the face as protected or not, and place the label below the box. The script finishes by reconstructing the frames back into a video form that can be viewed.
 
 ```
 python cctv_mask_detector.py \

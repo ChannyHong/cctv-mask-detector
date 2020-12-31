@@ -36,7 +36,7 @@ parser.add_argument('--train_examples_path', type=str, help='Required: the path 
 parser.add_argument('--train_dataset_size_per_class', type=int, help='Required: the number of train examples in "protected" and "unprotected" folders (or the smaller of the two)', default=500)
 parser.add_argument('--batch_size_per_class', type=int, help='Required: the number of train examples to include in a batch per class', default=4)
 parser.add_argument('--num_epochs', type=int, help='Required: the number of epochs to run training', default=50)
-parser.add_argument('--detector_model_output_path', type=str, help='The path to save the trained detector model file', default="models/detector.pt")
+parser.add_argument('--detector_model_output_path', type=str, help='The path to save the trained detector model file', required=True)
 parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
 parser.add_argument('--pretrained_detector_model_path', type=str, help='Optional: the path to the pretrained detector .pt model file', default=None)
 
@@ -90,7 +90,7 @@ def main():
             device=device, keep_all=True
         )
 
-    detector = Detector()
+    detector = Detector(pretrained_model_path=args.pretrained_detector_model_path)
 
     train_image_dir = args.train_examples_path
     train_dataset_size = args.train_dataset_size_per_class

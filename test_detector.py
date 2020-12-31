@@ -33,6 +33,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--detector_model_path', type=str, help='Required: the path to the detector .pt model file', required=True)
 parser.add_argument('--test_examples_path', type=str, help='Required: the path to the folder consisting of "protected" and "unprotected" test examples', default="mask_dataset/test")
 parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
+parser.add_argument('--detector_model_path', type=str, help='Optional: the path to the custom detector .pt model file', default=None)
 
 args = parser.parse_args()
 
@@ -63,11 +64,18 @@ def main():
     #device = "cpu"
     print('Running on device: {}'.format(device))
 
-    mtcnn = MTCNN(
-        image_size=160, margin=0, min_face_size=20,
-        thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
-        device=device, keep_all=True
-    )
+    if args.mtcnn_model_path:
+        mtcnn = MTCNN(
+            image_size=160, margin=0, min_face_size=20,
+            thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
+            device=device, keep_all=True, pretrained_model_path=args.mtcnn_model_path
+        )
+    else:
+        mtcnn = MTCNN(
+            image_size=160, margin=0, min_face_size=20,
+            thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
+            device=device, keep_all=True
+        )
 
     detector = Detector(pretrained_model_path=args.detector_model_path)
 
