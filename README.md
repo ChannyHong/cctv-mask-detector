@@ -299,7 +299,7 @@ python cctv_mask_detector.py \
 
 Hooray! Now the model seems to be doing a good job both recognizing the face and classifying whether it is protected or not.
 
-## Integrating Labeling Work Into MLOps Using Superb AI's Suite
+## Integrating Data Labeling Into ML Project Workflow Using Superb AI's Suite
 
 To recap, I was able to train and deploy a decently working model that detects whether folks' faces are protected or not as they enter the view of the security camera. I was able to quickstart the training process by using a pretrained MTCNN face recognizier and using a publicliy available face mask dataset to train the mask detector. Then, when it was clear that the manual labeling of live data was necessary to finetune both components, I used the Suite to easily upload the images, distribute the workload, and download the labels.
 
