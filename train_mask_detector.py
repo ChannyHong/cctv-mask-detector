@@ -14,7 +14,6 @@
 #
 # Authors: Channy Hong
 
-
 import json
 import os
 
@@ -27,7 +26,6 @@ import torch.nn.functional as F
 
 import argparse
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--train_examples_path', type=str, help='Required: the path to the folder consisting of "protected" and "unprotected" train examples', default="mask_dataset/train")
 parser.add_argument('--train_dataset_size_per_class', type=int, help='Required: the number of train examples in "protected" and "unprotected" folders (or the smaller of the two)', default=500)
@@ -36,14 +34,10 @@ parser.add_argument('--num_epochs', type=int, help='Required: the number of epoc
 parser.add_argument('--detector_model_output_path', type=str, help='The path to save the trained detector model file', required=True)
 parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
 
-
 args = parser.parse_args()
 
 
-
 BATCH_SIZE_PER_CLASS = args.batch_size_per_class
-
-
 
 class Detector(nn.Module):
     def __init__(self):
@@ -61,12 +55,9 @@ class Detector(nn.Module):
         x = self.fc(x)
         return torch.sigmoid(x)
 
-
 def main():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    #device = "cpu"
     print('Running on device: {}'.format(device))
-
 
     if args.mtcnn_model_path:
         mtcnn = MTCNN(
@@ -152,11 +143,8 @@ def main():
             loss.backward()
             optimizer.step()
 
-            #if loss < 0.1:
-            #    torch.save(detector.state_dict(), "./test_ep{}_iter{}_loss{}.pt".format(epoch, iteration_num, loss))
-
     torch.save(detector.state_dict(), args.detector_model_output_path)
 
-
+# Driver code
 if __name__ == "__main__":
     main()

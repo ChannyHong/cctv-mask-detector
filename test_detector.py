@@ -28,7 +28,6 @@ import torch.nn.functional as F
 
 import argparse
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--detector_model_path', type=str, help='Required: the path to the detector .pt model file', required=True)
 parser.add_argument('--test_examples_path', type=str, help='Required: the path to the folder consisting of "protected" and "unprotected" test examples', default="mask_dataset/test")
@@ -59,9 +58,7 @@ class Detector(nn.Module):
 
 
 def main():
-
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    #device = "cpu"
     print('Running on device: {}'.format(device))
 
     if args.mtcnn_model_path:
@@ -121,7 +118,6 @@ def main():
                 unprotected_face = torch.squeeze(unprotected_faces)
                 test_examples.append((unprotected_face, 0))
     
-
     # SHUFFLE TEST EXAMPLES
     random.shuffle(test_examples)
 
@@ -168,5 +164,6 @@ def main():
 
     print("Accuracy: ", float(num_correct) / float(num_correct + num_incorrect))
 
+# Driver code
 if __name__ == "__main__":
     main()

@@ -28,16 +28,21 @@ args = parser.parse_args()
 
 FRAMES_PER_EXTRACT = args.frames_per_extract
 
-footages = os.listdir(args.footage_dir)
-footages.remove(".DS_Store")
+def main():
+	footages = os.listdir(args.footage_dir)
+	footages.remove(".DS_Store")
 
-for footage in footages:
-	vidcap = cv2.VideoCapture(os.path.join(args.footage_dir, footage))
-	success, image = vidcap.read()
-	count = 0
-
-	while success:
-		if count % FRAMES_PER_EXTRACT == 0:
-			cv2.imwrite(os.path.join(args.output_dir, '{}-frame{}.jpg'.format(footage[:-4], count)), image)
+	for footage in footages:
+		vidcap = cv2.VideoCapture(os.path.join(args.footage_dir, footage))
 		success, image = vidcap.read()
-		count += 1
+		count = 0
+
+		while success:
+			if count % FRAMES_PER_EXTRACT == 0:
+				cv2.imwrite(os.path.join(args.output_dir, '{}-frame{}.jpg'.format(footage[:-4], count)), image)
+			success, image = vidcap.read()
+			count += 1
+
+# Driver code
+if __name__ == "__main__":
+	main()

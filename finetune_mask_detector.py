@@ -14,7 +14,6 @@
 #
 # Authors: Channy Hong
 
-
 import json
 import os
 
@@ -27,7 +26,6 @@ import torch.nn.functional as F
 
 import argparse
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--train_images_dir', type=str, help='Required: the path to the folder consisting of "protected" and "unprotected" train examples', default="mask_dataset/train")
 parser.add_argument('--train_metadata_dir', type=str, help='Required: the path to the folder consisting of "protected" and "unprotected" train examples', default="mask_dataset/train")
@@ -38,14 +36,11 @@ parser.add_argument('--detector_model_output_path', type=str, help='The path to 
 parser.add_argument('--mtcnn_model_path', type=str, help='Optional: the path to the custom MTCNN .pt model file', default=None)
 parser.add_argument('--pretrained_detector_model_path', type=str, help='Optional: the path to the custom detector .pt model file', default=None)
 
-
 args = parser.parse_args()
 
 
 
 BATCH_SIZE = args.batch_size
-
-
 
 class Detector(nn.Module):
     def __init__(self, pretrained_model_path=None):
@@ -87,13 +82,10 @@ def main():
             device=device, keep_all=True
         )
 
-    etector = Detector(pretrained_model_path=args.detector_model_path)
-
+    detector = Detector(pretrained_model_path=args.detector_model_path)
 
     train_image_list = os.listdir(args.train_metadata_dir)
     train_dataset_size = len(train_image_list)
-
-
 
     criterion = nn.BCELoss() # binary cross entropy
 
@@ -165,6 +157,6 @@ def main():
 
     torch.save(detector.state_dict(), args.detector_model_output_path)
 
-
+# Driver code
 if __name__ == "__main__":
     main()

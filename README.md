@@ -14,7 +14,7 @@ The year 2020 was shaped by the coronavirus pandemic in ways that pervaded our e
 
 On a separate note, I also wanted to internally test out the usefulness of Superb AI's [Suite](https://suite.superb-ai.com/) within a machine learning project workflow. This was because during my internship, I was exposed to the various ways in which machine learning projects en route to deployment face obstacles and difficulties. And perhaps one of the most common challenges faced was in continuously integrating the data annotation process into the project workflow, which is absolutely essential in combating the ever-so prevalent problem of concept drift.
 
-Concept drift occurs when deployed models assume that the incoming live data will be similar to that it was trained on. The fact of the matter is that it often is not the case - in some cases even impossible - that the data that our deployed model will predict on will be of the same distribution as the training data used for its training. In almost all cases, a subset of the live data must be continuosuly annotated and fed back into the training loop to make sure that the model doesn't degrade over time.
+Concept drift occurs when deployed models assume that the incoming live data will be similar to that it was trained on. The fact of the matter is that it often is not the case - in some cases even impossible - that the data that our deployed model will predict on will be of the same distribution as the training data used for its training. In almost all cases, a subset of the live data must be continuously annotated and fed back into the training loop to make sure that the model doesn't degrade over time.
 
 ## Big Picture
 
@@ -311,4 +311,4 @@ We can keep collecting these frames and store them in some folder, and when that
 
 Then, we can use Superb AI's Suite to quickly distribute the annotation work to the project labelers, while the manager can continually check-in on the project analytics and conduct quality assurance. When the labeling is complete, the annotations can be re-introduced to the training cycle to further finetune / train the deployed models.
 
-As machine learning becomes more and more prevalent in today's tech stacks, the flexibility and integratibility of data labeling - by far the most human labor intensive part of the process - is key to a successful deployment of an ML project. And Superb AI's Suite can help you get there.
+As machine learning becomes more and more prevalent in today's tech stacks, the flexibility and 'integratibility' of data labeling - by far the most human labor intensive part of the process - is key to a successful deployment of an ML project. And Superb AI's Suite can help you get there.
